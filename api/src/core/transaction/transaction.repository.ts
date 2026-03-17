@@ -75,9 +75,8 @@ export const updateTransaction = async (
     .execute();
 };
 
-export const deleteTransaction = async (transactionId: string): Promise<void> => {
-  await db
-    .deleteFrom("transactions")
-    .where("id", "=", transactionId)
-    .execute();
+export const deleteTransaction = async (
+  transactionId: string,
+): Promise<void> => {
+  await db.deleteFrom("transactions").where("id", "=", transactionId).execute();
 };

@@ -1,4 +1,19 @@
 services:
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: budget-api
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/budget
+      BETTER_AUTH_SECRET: Fv0AXmdnYNR2pIEMQipn2LXBLZr3XpVv
+      BETTER_AUTH_URL: http://localhost:3000
+    ports:
+      - '3000:3000'
+
   postgres:
     image: postgres:17-alpine
     container_name: budget-postgres

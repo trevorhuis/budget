@@ -72,7 +72,9 @@ export const updateTransactionRecurring = async (
     .execute();
 };
 
-export const deleteTransactionRecurring = async (templateId: string): Promise<void> => {
+export const deleteTransactionRecurring = async (
+  templateId: string,
+): Promise<void> => {
   await db
     .deleteFrom("transactionRecurring")
     .where("id", "=", templateId)

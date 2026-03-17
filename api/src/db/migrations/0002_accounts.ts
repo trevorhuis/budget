@@ -16,9 +16,7 @@ export async function up(db: Kysely<any>): Promise<void> {
       col.notNull().defaultTo(sql`now()`),
     )
     .execute();
-
 }
-
 
 export async function down(db: Kysely<any>): Promise<void> {
   await db.schema.dropTable("accounts").ifExists().execute();

@@ -5,7 +5,9 @@ import {
   type UpdateCategory,
 } from "./category.model.js";
 
-export const getCategoriesByUser = async (userId: string): Promise<Category[]> => {
+export const getCategoriesByUser = async (
+  userId: string,
+): Promise<Category[]> => {
   return await db
     .selectFrom("categories")
     .selectAll()
@@ -27,7 +29,9 @@ export const getCategoryByUserAndId = async (
   return category ?? null;
 };
 
-export const getCategoryById = async (categoryId: string): Promise<Category | null> => {
+export const getCategoryById = async (
+  categoryId: string,
+): Promise<Category | null> => {
   const category = await db
     .selectFrom("categories")
     .selectAll()
@@ -37,7 +41,9 @@ export const getCategoryById = async (categoryId: string): Promise<Category | nu
   return category ?? null;
 };
 
-export const insertCategory = async (categoryData: InsertCategory): Promise<void> => {
+export const insertCategory = async (
+  categoryData: InsertCategory,
+): Promise<void> => {
   const now = new Date().toISOString();
 
   await db

@@ -1,10 +1,6 @@
 import type { InsertBudgetItem, UpdateBudgetItem } from "./budgetItem.model.js";
-import {
-  getBudgetByUserAndId,
-} from "../budget/budget.repository.js";
-import {
-  getCategoryByUserAndId,
-} from "../category/category.repository.js";
+import { getBudgetByUserAndId } from "../budget/budget.repository.js";
+import { getCategoryByUserAndId } from "../category/category.repository.js";
 import {
   deleteBudgetItem,
   getBudgetItemById,
@@ -14,7 +10,10 @@ import {
 } from "./budgetItem.repository.js";
 import { AccessDeniedException, NotFoundException } from "../../errors.js";
 
-export const createBudgetItem = async (budgetItem: InsertBudgetItem, userId: string) => {
+export const createBudgetItem = async (
+  budgetItem: InsertBudgetItem,
+  userId: string,
+) => {
   const [budget, category] = await Promise.all([
     getBudgetByUserAndId(userId, budgetItem.budgetId),
     getCategoryByUserAndId(userId, budgetItem.categoryId),
@@ -51,7 +50,10 @@ export const budgetItemUpdate = async (
   return true;
 };
 
-export const removeBudgetItem = async (userId: string, budgetItemId: string) => {
+export const removeBudgetItem = async (
+  userId: string,
+  budgetItemId: string,
+) => {
   const foundItem = await getBudgetItemById(budgetItemId);
   if (!foundItem) {
     throw new NotFoundException("Budget item not found");

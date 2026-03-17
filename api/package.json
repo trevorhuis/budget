@@ -6,7 +6,9 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "migrate": "tsx --env-file=.env src/db/migrate.ts",
-    "seed": "tsx --env-file=.env src/db/seed.ts"
+    "seed": "tsx --env-file=.env src/db/seed.ts",
+    "test:e2e": "NODE_ENV=test tsx --env-file=.env --test src/**/*.test.ts",
+    "format": "prettier . --write"
   },
   "dependencies": {
     "@hono/node-server": "^1.19.11",

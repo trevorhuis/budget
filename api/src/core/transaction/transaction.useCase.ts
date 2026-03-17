@@ -1,7 +1,8 @@
-import type { InsertTransaction, UpdateTransaction } from "./transaction.model.js";
-import {
-  getAccountByUserAndId,
-} from "../account/account.repository.js";
+import type {
+  InsertTransaction,
+  UpdateTransaction,
+} from "./transaction.model.js";
+import { getAccountByUserAndId } from "../account/account.repository.js";
 import { getBudgetByUserAndId } from "../budget/budget.repository.js";
 import { getCategoryByUserAndId } from "../category/category.repository.js";
 import { getTransactionRecurringByUserAndId } from "../transactionRecurring/transactionRecurring.repository.js";
@@ -14,9 +15,7 @@ import {
 } from "./transaction.repository.js";
 import { AccessDeniedException, NotFoundException } from "../../errors.js";
 
-export const createTransaction = async (
-  transaction: InsertTransaction,
-) => {
+export const createTransaction = async (transaction: InsertTransaction) => {
   const [account, budget, category, template] = await Promise.all([
     getAccountByUserAndId(transaction.userId, transaction.accountId),
     getBudgetByUserAndId(transaction.userId, transaction.budgetId),
@@ -62,7 +61,10 @@ export const transactionUpdate = async (
   return true;
 };
 
-export const removeTransaction = async (userId: string, transactionId: string) => {
+export const removeTransaction = async (
+  userId: string,
+  transactionId: string,
+) => {
   const foundTransaction = await getTransactionById(transactionId);
   if (!foundTransaction) {
     throw new NotFoundException("Transaction not found");

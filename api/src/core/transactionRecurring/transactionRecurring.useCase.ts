@@ -15,7 +15,10 @@ import { AccessDeniedException, NotFoundException } from "../../errors.js";
 export const createTransactionRecurring = async (
   template: InsertTransactionRecurring,
 ) => {
-  const category = await getCategoryByUserAndId(template.userId, template.categoryId);
+  const category = await getCategoryByUserAndId(
+    template.userId,
+    template.categoryId,
+  );
   if (!category) {
     throw new NotFoundException("Category not found");
   }
@@ -46,7 +49,10 @@ export const transactionRecurringUpdate = async (
   return true;
 };
 
-export const removeTransactionRecurring = async (userId: string, templateId: string) => {
+export const removeTransactionRecurring = async (
+  userId: string,
+  templateId: string,
+) => {
   const foundTemplate = await getTransactionRecurringById(templateId);
   if (!foundTemplate) {
     throw new NotFoundException("Recurring template not found");

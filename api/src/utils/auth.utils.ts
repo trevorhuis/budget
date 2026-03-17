@@ -1,6 +1,8 @@
 import { validateString } from "./validator.utils.js";
 
-export const getAuthenticatedUserId = async (userId: unknown): Promise<string | null> => {
+export const getAuthenticatedUserId = async (
+  userId: unknown,
+): Promise<string | null> => {
   if (typeof userId !== "string") {
     return null;
   }
@@ -11,4 +13,3 @@ export const getAuthenticatedUserId = async (userId: unknown): Promise<string | 
     return null;
   }
 };
-

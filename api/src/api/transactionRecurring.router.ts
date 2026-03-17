@@ -5,7 +5,10 @@ import { ZodError } from "zod";
 import { userMiddleware } from "./user.middleware.js";
 import { getAuthenticatedUserId } from "../utils/auth.utils.js";
 import { validateString } from "../utils/validator.utils.js";
-import { InsertTransactionRecurringSchema, UpdateTransactionRecurringSchema } from "../core/transactionRecurring/transactionRecurring.model.js";
+import {
+  InsertTransactionRecurringSchema,
+  UpdateTransactionRecurringSchema,
+} from "../core/transactionRecurring/transactionRecurring.model.js";
 import {
   createTransactionRecurring,
   readRecurringFromUser,

@@ -5,7 +5,10 @@ import { ZodError } from "zod";
 import { userMiddleware } from "./user.middleware.js";
 import { getAuthenticatedUserId } from "../utils/auth.utils.js";
 import { validateString } from "../utils/validator.utils.js";
-import { InsertAccountSchema, UpdateAccountSchema } from "../core/account/account.model.js";
+import {
+  InsertAccountSchema,
+  UpdateAccountSchema,
+} from "../core/account/account.model.js";
 import {
   accountUpdate,
   createAccount,

@@ -9,5 +9,3 @@ export class AccessDeniedException extends Error {
     super(message);
   }
 }
-
-

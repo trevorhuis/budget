@@ -5,7 +5,9 @@ import {
   type UpdateBudgetItem,
 } from "./budgetItem.model.js";
 
-export const getBudgetItemsByUser = async (userId: string): Promise<BudgetItem[]> => {
+export const getBudgetItemsByUser = async (
+  userId: string,
+): Promise<BudgetItem[]> => {
   return await db
     .selectFrom("budgetItems")
     .innerJoin("budgets", "budgets.id", "budgetItems.budgetId")
@@ -14,7 +16,9 @@ export const getBudgetItemsByUser = async (userId: string): Promise<BudgetItem[]
     .execute();
 };
 
-export const getBudgetItemById = async (budgetItemId: string): Promise<BudgetItem | null> => {
+export const getBudgetItemById = async (
+  budgetItemId: string,
+): Promise<BudgetItem | null> => {
   const budgetItem = await db
     .selectFrom("budgetItems")
     .selectAll()
@@ -39,7 +43,9 @@ export const getBudgetItemByUserAndId = async (
   return budgetItem ?? null;
 };
 
-export const insertBudgetItem = async (budgetItemData: InsertBudgetItem): Promise<void> => {
+export const insertBudgetItem = async (
+  budgetItemData: InsertBudgetItem,
+): Promise<void> => {
   const now = new Date().toISOString();
 
   await db

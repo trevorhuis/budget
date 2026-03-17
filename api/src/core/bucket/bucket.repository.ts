@@ -1,5 +1,9 @@
 import { db } from "../../db/database.js";
-import { type Bucket, type InsertBucket, type UpdateBucket } from "./bucket.model.js";
+import {
+  type Bucket,
+  type InsertBucket,
+  type UpdateBucket,
+} from "./bucket.model.js";
 
 export const getBucketsByUser = async (userId: string): Promise<Bucket[]> => {
   return await db
@@ -23,7 +27,9 @@ export const getBucketByUserAndId = async (
   return bucket ?? null;
 };
 
-export const getBucketById = async (bucketId: string): Promise<Bucket | null> => {
+export const getBucketById = async (
+  bucketId: string,
+): Promise<Bucket | null> => {
   const bucket = await db
     .selectFrom("buckets")
     .selectAll()

@@ -87,7 +87,11 @@ export interface TransactionTable {
   accountId: string;
   budgetId: string;
   categoryId: string;
-  recurringTemplateId: ColumnType<string | null, string | undefined | null, string | null>;
+  recurringTemplateId: ColumnType<
+    string | null,
+    string | undefined | null,
+    string | null
+  >;
   createdAt: ColumnType<Date, string | undefined, never>;
   updatedAt: ColumnType<Date, string | undefined, Date>;
 }

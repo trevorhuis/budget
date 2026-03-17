@@ -6,10 +6,7 @@ import {
   updateAccount,
   getAccountById,
 } from "./account.repository.js";
-import {
-  AccessDeniedException,
-  NotFoundException,
-} from "../../errors.js";
+import { AccessDeniedException, NotFoundException } from "../../errors.js";
 
 export const createAccount = async (account: InsertAccount) => {
   await insertAccount(account);
