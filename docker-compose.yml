@@ -1,7 +1,7 @@
 services:
   api:
     build:
-      context: ./api
+      context: ./packages/api
       dockerfile: Dockerfile
     container_name: budget-api
     depends_on:
