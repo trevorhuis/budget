@@ -48,8 +48,8 @@ export interface BucketTable {
 export interface CategoryTable {
   id: string;
   name: string;
+  group: string;
   type: "income" | "expense";
-  status: "active" | "inactive";
   userId: string;
   createdAt: ColumnType<Date, string | undefined, never>;
   updatedAt: ColumnType<Date, string | undefined, Date>;
@@ -58,8 +58,8 @@ export interface CategoryTable {
 export interface BudgetItemTable {
   id: string;
   name: string;
-  allocatedAmount: number;
   actualAmount: number;
+  spentAmount: number;
   budgetId: string;
   categoryId: string;
   createdAt: ColumnType<Date, string | undefined, never>;
@@ -86,7 +86,7 @@ export interface TransactionTable {
   userId: string;
   accountId: string;
   budgetId: string;
-  categoryId: string;
+  categoryId: ColumnType<string | null, string | null | undefined, string | null>;
   recurringTemplateId: ColumnType<
     string | null,
     string | undefined | null,

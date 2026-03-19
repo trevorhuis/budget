@@ -1,10 +1,11 @@
 import * as z from "zod";
-import { CategoryBase, IdSchema } from "schemas";
+import { CategoryBase, CategorySchema, IdSchema } from "schemas";
 
 export const UpdateCategorySchema = CategoryBase;
 export const InsertCategorySchema = CategoryBase.extend({
   id: IdSchema,
 });
 
-export type UpdateCategory = z.infer<typeof CategoryBase>;
+export type Category = z.infer<typeof CategorySchema>;
+export type UpdateCategory = z.infer<typeof UpdateCategorySchema>;
 export type InsertCategory = z.infer<typeof InsertCategorySchema>;

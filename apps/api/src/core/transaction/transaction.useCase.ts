@@ -19,7 +19,9 @@ export const createTransaction = async (transaction: InsertTransaction) => {
   const [account, budget, category, template] = await Promise.all([
     getAccountByUserAndId(transaction.userId, transaction.accountId),
     getBudgetByUserAndId(transaction.userId, transaction.budgetId),
-    getCategoryByUserAndId(transaction.userId, transaction.categoryId),
+    transaction.categoryId
+      ? getCategoryByUserAndId(transaction.userId, transaction.categoryId)
+      : Promise.resolve(null),
     transaction.recurringTemplateId
       ? getTransactionRecurringByUserAndId(
           transaction.userId,
@@ -28,7 +30,11 @@ export const createTransaction = async (transaction: InsertTransaction) => {
       : Promise.resolve(null),
   ]);
 
-  if (!account || !budget || !category) {
+  if (!account || !budget) {
+    throw new NotFoundException("Referenced resource not found");
+  }
+
+  if (transaction.categoryId && !category) {
     throw new NotFoundException("Referenced resource not found");
   }
 

@@ -66,7 +66,7 @@ export const updateBudgetItem = async (
     .updateTable("budgetItems")
     .set({
       name: budgetItem.name,
-      allocatedAmount: budgetItem.allocatedAmount,
+      spentAmount: budgetItem.spentAmount,
       actualAmount: budgetItem.actualAmount,
       updatedAt: new Date(),
     })

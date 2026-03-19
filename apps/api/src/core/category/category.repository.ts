@@ -64,8 +64,8 @@ export const updateCategory = async (
     .updateTable("categories")
     .set({
       name: category.name,
+      group: category.group,
       type: category.type,
-      status: category.status,
       updatedAt: new Date(),
     })
     .where("id", "=", categoryId)

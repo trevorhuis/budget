@@ -1,10 +1,11 @@
 import * as z from "zod";
-import { TransactionBase, IdSchema } from "schemas"
+import { IdSchema, TransactionBase, TransactionSchema } from "schemas";
 
 export const UpdateTransactionSchema = TransactionBase;
 export const InsertTransactionSchema = TransactionBase.extend({
   id: IdSchema,
 });
 
+export type Transaction = z.infer<typeof TransactionSchema>;
 export type UpdateTransaction = z.infer<typeof UpdateTransactionSchema>;
 export type InsertTransaction = z.infer<typeof InsertTransactionSchema>;

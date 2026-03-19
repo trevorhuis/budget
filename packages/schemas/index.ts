@@ -1,11 +1,11 @@
 import * as z from "zod";
 
+export const IdSchema = z.uuidv7();
+
 const DatetimeSchema = z.object({
   createdAt: z.date().optional(),
   updatedAt: z.date().optional(),
 });
-
-export const IdSchema = z.uuidv7();
 
 const addIdAndDatetime = <TShape extends z.ZodRawShape>(
   schema: z.ZodObject<TShape>
@@ -52,8 +52,8 @@ export type Budget = z.infer<typeof BudgetSchema>;
 // Budget Item
 export const BudgetItemBase = z.object({
   name: z.string(),
-  allocatedAmount: z.number(),
   actualAmount: z.number(),
+  spentAmount: z.number(),
   budgetId: IdSchema,
   categoryId: IdSchema,
 });
@@ -64,8 +64,8 @@ export type BudgetItem = z.infer<typeof BudgetItemSchema>;
 // Category
 export const CategoryBase = z.object({
   name: z.string(),
+  group: z.string(),
   type: z.enum(["income", "expense"]),
-  status: z.enum(["active", "inactive"]),
   userId: IdSchema,
 });
 
@@ -81,7 +81,7 @@ export const TransactionBase = z.object({
   userId: IdSchema,
   accountId: IdSchema,
   budgetId: IdSchema,
-  categoryId: IdSchema,
+  categoryId: IdSchema.nullable().optional(),
   recurringTemplateId: IdSchema.optional().nullable(),
 });
 
@@ -101,4 +101,3 @@ export const TransactionRecurringSchema = addIdAndDatetime(
   TransactionRecurringBase
 );
 export type TransactionRecurring = z.infer<typeof TransactionRecurringSchema>;
-

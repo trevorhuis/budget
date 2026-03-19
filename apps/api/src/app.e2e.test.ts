@@ -91,8 +91,8 @@ const createCategory = async (
   categoryId: string,
   overrides: Partial<{
     name: string;
+    group: string;
     type: "income" | "expense";
-    status: "active" | "inactive";
     headers: Record<string, string>;
   }> = {},
 ) => {
@@ -102,8 +102,8 @@ const createCategory = async (
     json: {
       id: categoryId,
       name: overrides.name ?? "Groceries",
+      group: overrides.group ?? "Essentials",
       type: overrides.type ?? "expense",
-      status: overrides.status ?? "active",
     },
   });
 
@@ -408,8 +408,8 @@ describe("categories router", () => {
       json: {
         id: "019cf45e-80f5-714a-a121-bb32f8364c01",
         name: "Paycheck",
+        group: "Income",
         type: "income",
-        status: "active",
       },
     });
     assert.equal(response.status, 201);
@@ -425,8 +425,8 @@ describe("categories router", () => {
         headers: primaryHeaders,
         json: {
           name: "Salary",
+          group: "Career",
           type: "income",
-          status: "inactive",
         },
       },
     );
@@ -438,8 +438,8 @@ describe("categories router", () => {
       json: {
         id: "019cf45e-80f5-714a-a121-bb32f8364c02",
         name: "Invalid",
+        group: "Income",
         type: "sideways",
-        status: "active",
       },
     });
     assert.equal(response.status, 400);
@@ -470,7 +470,7 @@ describe("budget items router", () => {
       json: {
         id: "019cf45e-80f5-714a-a121-bb32f8364d03",
         name: "Groceries line",
-        allocatedAmount: 500,
+        spentAmount: 500,
         actualAmount: 120,
         budgetId: "019cf45e-80f5-714a-a121-bb32f8364d01",
         categoryId: "019cf45e-80f5-714a-a121-bb32f8364d02",
@@ -489,7 +489,7 @@ describe("budget items router", () => {
         headers: primaryHeaders,
         json: {
           name: "Groceries line updated",
-          allocatedAmount: 650,
+          spentAmount: 650,
           actualAmount: 300,
         },
       },
@@ -502,7 +502,7 @@ describe("budget items router", () => {
       json: {
         id: "019cf45e-80f5-714a-a121-bb32f8364d04",
         name: "Broken refs",
-        allocatedAmount: 100,
+        spentAmount: 100,
         actualAmount: 0,
         budgetId: "019cf45e-80f5-714a-a121-bb32f8364dff",
         categoryId: "019cf45e-80f5-714a-a121-bb32f8364d02",
@@ -523,7 +523,7 @@ describe("budget items router", () => {
       json: {
         id: "019cf45e-80f5-714a-a121-bb32f8364d07",
         name: "Other user item",
-        allocatedAmount: 50,
+        spentAmount: 50,
         actualAmount: 25,
         budgetId: "019cf45e-80f5-714a-a121-bb32f8364d05",
         categoryId: "019cf45e-80f5-714a-a121-bb32f8364d06",
@@ -613,7 +613,7 @@ describe("recurring transaction router", () => {
 });
 
 describe("transactions router", () => {
-  test("supports full CRUD, foreign key validation, and ownership checks", async () => {
+  test("supports full CRUD, uncategorized transactions, foreign key validation, and ownership checks", async () => {
     await createAccount("019cf45e-80f5-714a-a121-bb32f8364f01");
     await createBudget("019cf45e-80f5-714a-a121-bb32f8364f02");
     await createCategory("019cf45e-80f5-714a-a121-bb32f8364f03");
@@ -645,6 +645,30 @@ describe("transactions router", () => {
     const listBody = await json(response);
     assert.equal(response.status, 200);
     assert.equal((listBody.data as JsonValue[]).length, 1);
+
+    response = await request("/api/transactions", {
+      method: "POST",
+      headers: primaryHeaders,
+      json: {
+        id: "019cf45e-80f5-714a-a121-bb32f8364f12",
+        merchant: "Cash Withdrawal",
+        amount: 40,
+        notes: "No category assigned yet",
+        date: "2026-03-11T09:00:00.000Z",
+        accountId: "019cf45e-80f5-714a-a121-bb32f8364f01",
+        budgetId: "019cf45e-80f5-714a-a121-bb32f8364f02",
+        categoryId: null,
+      },
+    });
+    assert.equal(response.status, 201);
+
+    const uncategorizedTransaction = await db
+      .selectFrom("transactions")
+      .selectAll()
+      .where("id", "=", "019cf45e-80f5-714a-a121-bb32f8364f12")
+      .executeTakeFirstOrThrow();
+
+    assert.equal(uncategorizedTransaction.categoryId, null);
 
     response = await request(
       "/api/transactions/019cf45e-80f5-714a-a121-bb32f8364f05",
@@ -727,5 +751,22 @@ describe("transactions router", () => {
       },
     );
     assert.equal(response.status, 403);
+
+    response = await request(
+      "/api/categories/019cf45e-80f5-714a-a121-bb32f8364f03",
+      {
+        method: "DELETE",
+        headers: primaryHeaders,
+      },
+    );
+    assert.equal(response.status, 200);
+
+    const recategorizedAsNull = await db
+      .selectFrom("transactions")
+      .selectAll()
+      .where("id", "=", "019cf45e-80f5-714a-a121-bb32f8364f05")
+      .executeTakeFirstOrThrow();
+
+    assert.equal(recategorizedAsNull.categoryId, null);
   });
 });

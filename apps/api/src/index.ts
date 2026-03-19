@@ -1,3 +1,4 @@
+import { fileURLToPath } from "node:url";
 import { serve } from "@hono/node-server";
 import { Hono, type Context } from "hono";
 import { logger } from "hono/logger";
@@ -11,7 +12,7 @@ import budgetItemRouter from "./api/budgetItem.router.js";
 import transactionRecurringRouter from "./api/transactionRecurring.router.js";
 import transactionRouter from "./api/transaction.router.js";
 
-const app = new Hono().basePath("/api");
+export const app = new Hono().basePath("/api");
 app.use(logger());
 app.use(
   "*",
@@ -33,12 +34,18 @@ app.route("/transactions", transactionRouter);
 
 app.get("/health", (c: Context) => c.text("OK!"));
 
-serve(
-  {
-    fetch: app.fetch,
-    port: 3000,
-  },
-  (info) => {
-    console.log(`Server is running on http://localhost:${info.port}`);
-  },
-);
+const isEntrypoint =
+  process.argv[1] !== undefined &&
+  fileURLToPath(import.meta.url) === process.argv[1];
+
+if (isEntrypoint) {
+  serve(
+    {
+      fetch: app.fetch,
+      port: 3000,
+    },
+    (info) => {
+      console.log(`Server is running on http://localhost:${info.port}`);
+    },
+  );
+}
