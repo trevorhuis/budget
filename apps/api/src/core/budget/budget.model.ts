@@ -1,7 +1,9 @@
 import * as z from "zod";
 import { BudgetBase, BudgetSchema, IdSchema } from "schemas";
 
-export const UpdateBudgetSchema = BudgetBase;
+export const UpdateBudgetSchema = BudgetBase.omit({
+  userId: true,
+});
 export const InsertBudgetSchema = BudgetBase.extend({
   id: IdSchema,
 });

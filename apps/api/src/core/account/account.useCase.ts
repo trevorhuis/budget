@@ -1,10 +1,11 @@
 import type { InsertAccount, UpdateAccount } from "./account.model.js";
 import {
-  insertAccount,
-  getAccountsByUser,
   deleteAccount,
-  updateAccount,
   getAccountById,
+  getAccountByUserAndId,
+  getAccountsByUser,
+  insertAccount,
+  updateAccount,
 } from "./account.repository.js";
 import { AccessDeniedException, NotFoundException } from "../../errors.js";
 
@@ -22,27 +23,31 @@ export const accountUpdate = async (
   accountId: string,
   account: UpdateAccount,
 ) => {
-  const foundAccount = await getAccountById(accountId);
+  const foundAccount = await getAccountByUserAndId(userId, accountId);
   if (!foundAccount) {
+    const existingAccount = await getAccountById(accountId);
+    if (existingAccount) {
+      throw new AccessDeniedException("Account ownership mismatch");
+    }
+
     throw new NotFoundException("Account not found");
   }
-  if (foundAccount.userId !== userId) {
-    throw new AccessDeniedException();
-  }
 
-  await updateAccount(accountId, account);
+  await updateAccount(userId, accountId, account);
   return true;
 };
 
 export const removeAccount = async (userId: string, accountId: string) => {
-  const account = await getAccountById(accountId);
+  const account = await getAccountByUserAndId(userId, accountId);
   if (!account) {
+    const existingAccount = await getAccountById(accountId);
+    if (existingAccount) {
+      throw new AccessDeniedException("Account ownership mismatch");
+    }
+
     throw new NotFoundException("Account not found");
   }
-  if (account.userId !== userId) {
-    throw new AccessDeniedException();
-  }
 
-  await deleteAccount(accountId);
+  await deleteAccount(userId, accountId);
   return true;
 };

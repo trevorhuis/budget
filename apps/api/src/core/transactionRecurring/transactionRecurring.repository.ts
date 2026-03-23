@@ -1,26 +1,26 @@
 import { db } from "../../db/database.js";
 import {
-  type TransactionRecurring,
-  type InsertTransactionRecurring,
-  type UpdateTransactionRecurring,
+  type RecurringTransaction,
+  type InsertRecurringTransaction,
+  type UpdateRecurringTransaction,
 } from "./transactionRecurring.model.js";
 
-export const getTransactionRecurringByUser = async (
+export const getRecurringTransactionByUser = async (
   userId: string,
-): Promise<TransactionRecurring[]> => {
+): Promise<RecurringTransaction[]> => {
   return await db
-    .selectFrom("transactionRecurring")
+    .selectFrom("recurringTransaction")
     .selectAll()
     .where("userId", "=", userId)
     .execute();
 };
 
-export const getTransactionRecurringByUserAndId = async (
+export const getRecurringTransactionByUserAndId = async (
   userId: string,
   templateId: string,
-): Promise<TransactionRecurring | null> => {
+): Promise<RecurringTransaction | null> => {
   const template = await db
-    .selectFrom("transactionRecurring")
+    .selectFrom("recurringTransaction")
     .selectAll()
     .where("userId", "=", userId)
     .where("id", "=", templateId)
@@ -29,11 +29,11 @@ export const getTransactionRecurringByUserAndId = async (
   return template ?? null;
 };
 
-export const getTransactionRecurringById = async (
+export const getRecurringTransactionById = async (
   templateId: string,
-): Promise<TransactionRecurring | null> => {
+): Promise<RecurringTransaction | null> => {
   const template = await db
-    .selectFrom("transactionRecurring")
+    .selectFrom("recurringTransaction")
     .selectAll()
     .where("id", "=", templateId)
     .executeTakeFirst();
@@ -41,13 +41,13 @@ export const getTransactionRecurringById = async (
   return template ?? null;
 };
 
-export const insertTransactionRecurring = async (
-  templateData: InsertTransactionRecurring,
+export const insertRecurringTransaction = async (
+  templateData: InsertRecurringTransaction,
 ): Promise<void> => {
   const now = new Date().toISOString();
 
   await db
-    .insertInto("transactionRecurring")
+    .insertInto("recurringTransaction")
     .values({
       ...templateData,
       createdAt: now,
@@ -56,27 +56,33 @@ export const insertTransactionRecurring = async (
     .executeTakeFirstOrThrow();
 };
 
-export const updateTransactionRecurring = async (
+export const updateRecurringTransaction = async (
+  userId: string,
   templateId: string,
-  template: UpdateTransactionRecurring,
+  template: UpdateRecurringTransaction,
 ): Promise<void> => {
   await db
-    .updateTable("transactionRecurring")
+    .updateTable("recurringTransaction")
     .set({
       merchant: template.merchant,
       amount: template.amount,
       notes: template.notes,
+      recurringDate: template.recurringDate,
+      categoryId: template.categoryId,
       updatedAt: new Date(),
     })
     .where("id", "=", templateId)
+    .where("userId", "=", userId)
     .execute();
 };
 
-export const deleteTransactionRecurring = async (
+export const deleteRecurringTransaction = async (
+  userId: string,
   templateId: string,
 ): Promise<void> => {
   await db
-    .deleteFrom("transactionRecurring")
+    .deleteFrom("recurringTransaction")
     .where("id", "=", templateId)
+    .where("userId", "=", userId)
     .execute();
 };

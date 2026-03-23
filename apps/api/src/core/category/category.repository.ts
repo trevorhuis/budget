@@ -57,6 +57,7 @@ export const insertCategory = async (
 };
 
 export const updateCategory = async (
+  userId: string,
   categoryId: string,
   category: UpdateCategory,
 ): Promise<void> => {
@@ -65,13 +66,21 @@ export const updateCategory = async (
     .set({
       name: category.name,
       group: category.group,
-      type: category.type,
+      status: category.status,
       updatedAt: new Date(),
     })
     .where("id", "=", categoryId)
+    .where("userId", "=", userId)
     .execute();
 };
 
-export const deleteCategory = async (categoryId: string): Promise<void> => {
-  await db.deleteFrom("categories").where("id", "=", categoryId).execute();
+export const deleteCategory = async (
+  userId: string,
+  categoryId: string,
+): Promise<void> => {
+  await db
+    .deleteFrom("categories")
+    .where("id", "=", categoryId)
+    .where("userId", "=", userId)
+    .execute();
 };

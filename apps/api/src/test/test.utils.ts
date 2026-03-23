@@ -3,10 +3,30 @@ import { sql } from "kysely";
 import { db } from "../db/database.js";
 import { runMigrations } from "../db/migrate.js";
 
-export const PRIMARY_USER_ID = "019cf45e-80f5-714a-a121-bb32f8364813";
-export const SECONDARY_USER_ID = "019cf45e-80f5-714a-a121-bb32f8364814";
-
 export const setupTestDatabase = async () => {
+  if (process.env.NODE_ENV !== "test") {
+    throw new Error("setupTestDatabase can only run in test mode.");
+  }
+
+  await sql`
+    DROP TABLE IF EXISTS
+      "transactions",
+      "recurringTransaction",
+      "budgetItems",
+      "accounts",
+      "budgets",
+      "categories",
+      "authSessions",
+      "authAccounts",
+      "authVerifications",
+      "users",
+      "kysely_migration_lock",
+      "kysely_migration"
+    CASCADE
+  `.execute(db);
+
+  await sql`DROP TYPE IF EXISTS "account_type" CASCADE`.execute(db);
+
   await runMigrations();
 };
 
@@ -14,21 +34,15 @@ export const resetTestDatabase = async () => {
   await sql`
     TRUNCATE TABLE
       "transactions",
-      "transactionRecurring",
+      "recurringTransaction",
       "budgetItems",
       "accounts",
-      "buckets",
       "budgets",
       "categories",
+      "authSessions",
+      "authAccounts",
+      "authVerifications",
       "users"
     RESTART IDENTITY CASCADE
   `.execute(db);
-
-  await db
-    .insertInto("users")
-    .values([
-      { id: PRIMARY_USER_ID, name: "Primary Tester" },
-      { id: SECONDARY_USER_ID, name: "Secondary Tester" },
-    ])
-    .execute();
 };

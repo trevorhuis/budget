@@ -9,12 +9,40 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as BudgetRouteImport } from './routes/budget'
+import { Route as RegisterRouteImport } from './routes/register'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppTransactionsRouteImport } from './routes/_app/transactions'
+import { Route as AppChatRouteImport } from './routes/_app/chat'
+import { Route as AppCalculatorsRouteImport } from './routes/_app/calculators'
+import { Route as AppBudgetRouteImport } from './routes/_app/budget'
+import { Route as AppAccountsRouteImport } from './routes/_app/accounts'
+import { Route as SharedCalculatorsShareTokenRouteImport } from './routes/shared.calculators.$shareToken'
+import { Route as AppTransactionsBulkRouteImport } from './routes/_app/transactions.bulk'
+import { Route as AppCalculatorsMortgageRouteImport } from './routes/_app/calculators.mortgage'
+import { Route as AppCalculatorsLoanRouteImport } from './routes/_app/calculators.loan'
+import { Route as AppCalculatorsDebtPayoffRouteImport } from './routes/_app/calculators.debt-payoff'
+import { Route as AppCalculatorsCompareRouteImport } from './routes/_app/calculators.compare'
 
-const BudgetRoute = BudgetRouteImport.update({
-  id: '/budget',
-  path: '/budget',
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -22,40 +50,209 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppTransactionsRoute = AppTransactionsRouteImport.update({
+  id: '/transactions',
+  path: '/transactions',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppChatRoute = AppChatRouteImport.update({
+  id: '/chat',
+  path: '/chat',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCalculatorsRoute = AppCalculatorsRouteImport.update({
+  id: '/calculators',
+  path: '/calculators',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppBudgetRoute = AppBudgetRouteImport.update({
+  id: '/budget',
+  path: '/budget',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAccountsRoute = AppAccountsRouteImport.update({
+  id: '/accounts',
+  path: '/accounts',
+  getParentRoute: () => AppRoute,
+} as any)
+const SharedCalculatorsShareTokenRoute =
+  SharedCalculatorsShareTokenRouteImport.update({
+    id: '/shared/calculators/$shareToken',
+    path: '/shared/calculators/$shareToken',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AppTransactionsBulkRoute = AppTransactionsBulkRouteImport.update({
+  id: '/bulk',
+  path: '/bulk',
+  getParentRoute: () => AppTransactionsRoute,
+} as any)
+const AppCalculatorsMortgageRoute = AppCalculatorsMortgageRouteImport.update({
+  id: '/mortgage',
+  path: '/mortgage',
+  getParentRoute: () => AppCalculatorsRoute,
+} as any)
+const AppCalculatorsLoanRoute = AppCalculatorsLoanRouteImport.update({
+  id: '/loan',
+  path: '/loan',
+  getParentRoute: () => AppCalculatorsRoute,
+} as any)
+const AppCalculatorsDebtPayoffRoute =
+  AppCalculatorsDebtPayoffRouteImport.update({
+    id: '/debt-payoff',
+    path: '/debt-payoff',
+    getParentRoute: () => AppCalculatorsRoute,
+  } as any)
+const AppCalculatorsCompareRoute = AppCalculatorsCompareRouteImport.update({
+  id: '/compare',
+  path: '/compare',
+  getParentRoute: () => AppCalculatorsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/budget': typeof BudgetRoute
+  '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
+  '/register': typeof RegisterRoute
+  '/accounts': typeof AppAccountsRoute
+  '/budget': typeof AppBudgetRoute
+  '/calculators': typeof AppCalculatorsRouteWithChildren
+  '/chat': typeof AppChatRoute
+  '/transactions': typeof AppTransactionsRouteWithChildren
+  '/calculators/compare': typeof AppCalculatorsCompareRoute
+  '/calculators/debt-payoff': typeof AppCalculatorsDebtPayoffRoute
+  '/calculators/loan': typeof AppCalculatorsLoanRoute
+  '/calculators/mortgage': typeof AppCalculatorsMortgageRoute
+  '/transactions/bulk': typeof AppTransactionsBulkRoute
+  '/shared/calculators/$shareToken': typeof SharedCalculatorsShareTokenRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/budget': typeof BudgetRoute
+  '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
+  '/register': typeof RegisterRoute
+  '/accounts': typeof AppAccountsRoute
+  '/budget': typeof AppBudgetRoute
+  '/calculators': typeof AppCalculatorsRouteWithChildren
+  '/chat': typeof AppChatRoute
+  '/transactions': typeof AppTransactionsRouteWithChildren
+  '/calculators/compare': typeof AppCalculatorsCompareRoute
+  '/calculators/debt-payoff': typeof AppCalculatorsDebtPayoffRoute
+  '/calculators/loan': typeof AppCalculatorsLoanRoute
+  '/calculators/mortgage': typeof AppCalculatorsMortgageRoute
+  '/transactions/bulk': typeof AppTransactionsBulkRoute
+  '/shared/calculators/$shareToken': typeof SharedCalculatorsShareTokenRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/budget': typeof BudgetRoute
+  '/_app': typeof AppRouteWithChildren
+  '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
+  '/register': typeof RegisterRoute
+  '/_app/accounts': typeof AppAccountsRoute
+  '/_app/budget': typeof AppBudgetRoute
+  '/_app/calculators': typeof AppCalculatorsRouteWithChildren
+  '/_app/chat': typeof AppChatRoute
+  '/_app/transactions': typeof AppTransactionsRouteWithChildren
+  '/_app/calculators/compare': typeof AppCalculatorsCompareRoute
+  '/_app/calculators/debt-payoff': typeof AppCalculatorsDebtPayoffRoute
+  '/_app/calculators/loan': typeof AppCalculatorsLoanRoute
+  '/_app/calculators/mortgage': typeof AppCalculatorsMortgageRoute
+  '/_app/transactions/bulk': typeof AppTransactionsBulkRoute
+  '/shared/calculators/$shareToken': typeof SharedCalculatorsShareTokenRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/budget'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/onboarding'
+    | '/register'
+    | '/accounts'
+    | '/budget'
+    | '/calculators'
+    | '/chat'
+    | '/transactions'
+    | '/calculators/compare'
+    | '/calculators/debt-payoff'
+    | '/calculators/loan'
+    | '/calculators/mortgage'
+    | '/transactions/bulk'
+    | '/shared/calculators/$shareToken'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/budget'
-  id: '__root__' | '/' | '/budget'
+  to:
+    | '/'
+    | '/login'
+    | '/onboarding'
+    | '/register'
+    | '/accounts'
+    | '/budget'
+    | '/calculators'
+    | '/chat'
+    | '/transactions'
+    | '/calculators/compare'
+    | '/calculators/debt-payoff'
+    | '/calculators/loan'
+    | '/calculators/mortgage'
+    | '/transactions/bulk'
+    | '/shared/calculators/$shareToken'
+  id:
+    | '__root__'
+    | '/'
+    | '/_app'
+    | '/login'
+    | '/onboarding'
+    | '/register'
+    | '/_app/accounts'
+    | '/_app/budget'
+    | '/_app/calculators'
+    | '/_app/chat'
+    | '/_app/transactions'
+    | '/_app/calculators/compare'
+    | '/_app/calculators/debt-payoff'
+    | '/_app/calculators/loan'
+    | '/_app/calculators/mortgage'
+    | '/_app/transactions/bulk'
+    | '/shared/calculators/$shareToken'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  BudgetRoute: typeof BudgetRoute
+  AppRoute: typeof AppRouteWithChildren
+  LoginRoute: typeof LoginRoute
+  OnboardingRoute: typeof OnboardingRoute
+  RegisterRoute: typeof RegisterRoute
+  SharedCalculatorsShareTokenRoute: typeof SharedCalculatorsShareTokenRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/budget': {
-      id: '/budget'
-      path: '/budget'
-      fullPath: '/budget'
-      preLoaderRoute: typeof BudgetRouteImport
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -65,12 +262,141 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/transactions': {
+      id: '/_app/transactions'
+      path: '/transactions'
+      fullPath: '/transactions'
+      preLoaderRoute: typeof AppTransactionsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/chat': {
+      id: '/_app/chat'
+      path: '/chat'
+      fullPath: '/chat'
+      preLoaderRoute: typeof AppChatRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/calculators': {
+      id: '/_app/calculators'
+      path: '/calculators'
+      fullPath: '/calculators'
+      preLoaderRoute: typeof AppCalculatorsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/budget': {
+      id: '/_app/budget'
+      path: '/budget'
+      fullPath: '/budget'
+      preLoaderRoute: typeof AppBudgetRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/accounts': {
+      id: '/_app/accounts'
+      path: '/accounts'
+      fullPath: '/accounts'
+      preLoaderRoute: typeof AppAccountsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/shared/calculators/$shareToken': {
+      id: '/shared/calculators/$shareToken'
+      path: '/shared/calculators/$shareToken'
+      fullPath: '/shared/calculators/$shareToken'
+      preLoaderRoute: typeof SharedCalculatorsShareTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app/transactions/bulk': {
+      id: '/_app/transactions/bulk'
+      path: '/bulk'
+      fullPath: '/transactions/bulk'
+      preLoaderRoute: typeof AppTransactionsBulkRouteImport
+      parentRoute: typeof AppTransactionsRoute
+    }
+    '/_app/calculators/mortgage': {
+      id: '/_app/calculators/mortgage'
+      path: '/mortgage'
+      fullPath: '/calculators/mortgage'
+      preLoaderRoute: typeof AppCalculatorsMortgageRouteImport
+      parentRoute: typeof AppCalculatorsRoute
+    }
+    '/_app/calculators/loan': {
+      id: '/_app/calculators/loan'
+      path: '/loan'
+      fullPath: '/calculators/loan'
+      preLoaderRoute: typeof AppCalculatorsLoanRouteImport
+      parentRoute: typeof AppCalculatorsRoute
+    }
+    '/_app/calculators/debt-payoff': {
+      id: '/_app/calculators/debt-payoff'
+      path: '/debt-payoff'
+      fullPath: '/calculators/debt-payoff'
+      preLoaderRoute: typeof AppCalculatorsDebtPayoffRouteImport
+      parentRoute: typeof AppCalculatorsRoute
+    }
+    '/_app/calculators/compare': {
+      id: '/_app/calculators/compare'
+      path: '/compare'
+      fullPath: '/calculators/compare'
+      preLoaderRoute: typeof AppCalculatorsCompareRouteImport
+      parentRoute: typeof AppCalculatorsRoute
+    }
   }
 }
 
+interface AppCalculatorsRouteChildren {
+  AppCalculatorsCompareRoute: typeof AppCalculatorsCompareRoute
+  AppCalculatorsDebtPayoffRoute: typeof AppCalculatorsDebtPayoffRoute
+  AppCalculatorsLoanRoute: typeof AppCalculatorsLoanRoute
+  AppCalculatorsMortgageRoute: typeof AppCalculatorsMortgageRoute
+}
+
+const AppCalculatorsRouteChildren: AppCalculatorsRouteChildren = {
+  AppCalculatorsCompareRoute: AppCalculatorsCompareRoute,
+  AppCalculatorsDebtPayoffRoute: AppCalculatorsDebtPayoffRoute,
+  AppCalculatorsLoanRoute: AppCalculatorsLoanRoute,
+  AppCalculatorsMortgageRoute: AppCalculatorsMortgageRoute,
+}
+
+const AppCalculatorsRouteWithChildren = AppCalculatorsRoute._addFileChildren(
+  AppCalculatorsRouteChildren,
+)
+
+interface AppTransactionsRouteChildren {
+  AppTransactionsBulkRoute: typeof AppTransactionsBulkRoute
+}
+
+const AppTransactionsRouteChildren: AppTransactionsRouteChildren = {
+  AppTransactionsBulkRoute: AppTransactionsBulkRoute,
+}
+
+const AppTransactionsRouteWithChildren = AppTransactionsRoute._addFileChildren(
+  AppTransactionsRouteChildren,
+)
+
+interface AppRouteChildren {
+  AppAccountsRoute: typeof AppAccountsRoute
+  AppBudgetRoute: typeof AppBudgetRoute
+  AppCalculatorsRoute: typeof AppCalculatorsRouteWithChildren
+  AppChatRoute: typeof AppChatRoute
+  AppTransactionsRoute: typeof AppTransactionsRouteWithChildren
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppAccountsRoute: AppAccountsRoute,
+  AppBudgetRoute: AppBudgetRoute,
+  AppCalculatorsRoute: AppCalculatorsRouteWithChildren,
+  AppChatRoute: AppChatRoute,
+  AppTransactionsRoute: AppTransactionsRouteWithChildren,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  BudgetRoute: BudgetRoute,
+  AppRoute: AppRouteWithChildren,
+  LoginRoute: LoginRoute,
+  OnboardingRoute: OnboardingRoute,
+  RegisterRoute: RegisterRoute,
+  SharedCalculatorsShareTokenRoute: SharedCalculatorsShareTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

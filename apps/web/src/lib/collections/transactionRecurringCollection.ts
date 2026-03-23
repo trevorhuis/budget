@@ -1,17 +1,17 @@
-import { createCollection } from '@tanstack/react-db'
-import { queryCollectionOptions } from '@tanstack/query-db-collection'
-import { TransactionRecurringSchema, type TransactionRecurring } from 'schemas'
-import { queryClient } from '../integrations/queryClient'
-import { createCrudHandlers, getCollectionData } from './utils'
+import { createCollection } from "@tanstack/react-db";
+import { queryCollectionOptions } from "@tanstack/query-db-collection";
+import { RecurringTransactionSchema, type RecurringTransaction } from "schemas";
+import { queryClient } from "../integrations/queryClient";
+import { createCrudHandlers, getCollectionData } from "./utils";
 
-export const transactionRecurringCollection = createCollection(
+export const recurringTransactionCollection = createCollection(
   queryCollectionOptions({
-    schema: TransactionRecurringSchema,
+    schema: RecurringTransactionSchema,
     queryClient,
-    queryKey: ['transactionRecurring'],
-    getKey: (transactionRecurring) => transactionRecurring.id,
+    queryKey: ["recurringTransaction"],
+    getKey: (recurringTransaction) => recurringTransaction.id,
     queryFn: async () =>
-      getCollectionData<TransactionRecurring>('/api/transactions/recurring'),
-    ...createCrudHandlers<TransactionRecurring>('/api/transactions/recurring'),
-  })
-)
+      getCollectionData<RecurringTransaction>("/api/transactions/recurring"),
+    ...createCrudHandlers<RecurringTransaction>("/api/transactions/recurring"),
+  }),
+);

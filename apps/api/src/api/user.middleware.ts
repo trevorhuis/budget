@@ -1,19 +1,29 @@
 import { createMiddleware } from "hono/factory";
 
-export const userMiddleware = createMiddleware<{
-  Variables: { userId: string };
-}>(async (c, next) => {
-  const userIdHeader = c.req.header("x-user-id");
+import { auth, type AuthSession, type AuthUser } from "../lib/auth.js";
 
-  if (process.env.NODE_ENV === "test" && userIdHeader !== undefined) {
-    if (userIdHeader.trim() !== "" && userIdHeader !== "anonymous") {
-      c.set("userId", userIdHeader);
+export const userMiddleware = createMiddleware<{
+  Variables: {
+    session: AuthSession["session"];
+    authUser: AuthUser;
+    userId: string;
+  };
+}>(async (c, next) => {
+  try {
+    const session = await auth.api.getSession({
+      headers: c.req.raw.headers,
+    });
+
+    if (!session) {
+      return c.json({ error: "Unauthorized" }, 401);
     }
 
-    await next();
-    return;
-  }
+    c.set("session", session.session);
+    c.set("authUser", session.user);
+    c.set("userId", session.user.id);
 
-  c.set("userId", "019cf45e-80f5-714a-a121-bb32f8364813");
-  await next();
+    await next();
+  } catch {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
 });

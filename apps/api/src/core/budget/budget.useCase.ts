@@ -2,6 +2,7 @@ import type { InsertBudget, UpdateBudget } from "./budget.model.js";
 import {
   deleteBudget,
   getBudgetById,
+  getBudgetByUserAndId,
   getBudgetsByUser,
   insertBudget,
   updateBudget,
@@ -22,27 +23,31 @@ export const budgetUpdate = async (
   budgetId: string,
   budget: UpdateBudget,
 ) => {
-  const foundBudget = await getBudgetById(budgetId);
+  const foundBudget = await getBudgetByUserAndId(userId, budgetId);
   if (!foundBudget) {
+    const existingBudget = await getBudgetById(budgetId);
+    if (existingBudget) {
+      throw new AccessDeniedException("Budget ownership mismatch");
+    }
+
     throw new NotFoundException("Budget not found");
   }
-  if (foundBudget.userId !== userId) {
-    throw new AccessDeniedException("Budget ownership mismatch");
-  }
 
-  await updateBudget(budgetId, budget);
+  await updateBudget(userId, budgetId, budget);
   return true;
 };
 
 export const removeBudget = async (userId: string, budgetId: string) => {
-  const foundBudget = await getBudgetById(budgetId);
+  const foundBudget = await getBudgetByUserAndId(userId, budgetId);
   if (!foundBudget) {
+    const existingBudget = await getBudgetById(budgetId);
+    if (existingBudget) {
+      throw new AccessDeniedException("Budget ownership mismatch");
+    }
+
     throw new NotFoundException("Budget not found");
   }
-  if (foundBudget.userId !== userId) {
-    throw new AccessDeniedException("Budget ownership mismatch");
-  }
 
-  await deleteBudget(budgetId);
+  await deleteBudget(userId, budgetId);
   return true;
 };

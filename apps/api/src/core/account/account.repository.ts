@@ -58,11 +58,19 @@ export const insertAccount = async (
     .executeTakeFirstOrThrow();
 };
 
-export const deleteAccount = async (accountId: string): Promise<void> => {
-  await db.deleteFrom("accounts").where("id", "=", accountId).execute();
+export const deleteAccount = async (
+  userId: string,
+  accountId: string,
+): Promise<void> => {
+  await db
+    .deleteFrom("accounts")
+    .where("id", "=", accountId)
+    .where("userId", "=", userId)
+    .execute();
 };
 
 export const updateAccount = async (
+  userId: string,
   accountId: string,
   account: UpdateAccount,
 ) => {
@@ -77,5 +85,6 @@ export const updateAccount = async (
       updatedAt: now,
     })
     .where("id", "=", accountId)
+    .where("userId", "=", userId)
     .execute();
 };

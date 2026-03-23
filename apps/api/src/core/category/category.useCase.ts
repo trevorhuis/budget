@@ -1,10 +1,11 @@
 import type { InsertCategory, UpdateCategory } from "./category.model.js";
 import {
-  getCategoriesByUser,
+  deleteCategory,
   getCategoryById,
+  getCategoriesByUser,
+  getCategoryByUserAndId,
   insertCategory,
   updateCategory,
-  deleteCategory,
 } from "./category.repository.js";
 import { AccessDeniedException, NotFoundException } from "../../errors.js";
 
@@ -22,27 +23,31 @@ export const categoryUpdate = async (
   categoryId: string,
   category: UpdateCategory,
 ) => {
-  const foundCategory = await getCategoryById(categoryId);
+  const foundCategory = await getCategoryByUserAndId(userId, categoryId);
   if (!foundCategory) {
+    const existingCategory = await getCategoryById(categoryId);
+    if (existingCategory) {
+      throw new AccessDeniedException("Category ownership mismatch");
+    }
+
     throw new NotFoundException("Category not found");
   }
-  if (foundCategory.userId !== userId) {
-    throw new AccessDeniedException("Category ownership mismatch");
-  }
 
-  await updateCategory(categoryId, category);
+  await updateCategory(userId, categoryId, category);
   return true;
 };
 
 export const removeCategory = async (userId: string, categoryId: string) => {
-  const foundCategory = await getCategoryById(categoryId);
+  const foundCategory = await getCategoryByUserAndId(userId, categoryId);
   if (!foundCategory) {
+    const existingCategory = await getCategoryById(categoryId);
+    if (existingCategory) {
+      throw new AccessDeniedException("Category ownership mismatch");
+    }
+
     throw new NotFoundException("Category not found");
   }
-  if (foundCategory.userId !== userId) {
-    throw new AccessDeniedException("Category ownership mismatch");
-  }
 
-  await deleteCategory(categoryId);
+  await deleteCategory(userId, categoryId);
   return true;
 };

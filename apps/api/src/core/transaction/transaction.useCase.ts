@@ -3,12 +3,12 @@ import type {
   UpdateTransaction,
 } from "./transaction.model.js";
 import { getAccountByUserAndId } from "../account/account.repository.js";
-import { getBudgetByUserAndId } from "../budget/budget.repository.js";
-import { getCategoryByUserAndId } from "../category/category.repository.js";
-import { getTransactionRecurringByUserAndId } from "../transactionRecurring/transactionRecurring.repository.js";
+import { getBudgetItemByUserAndId } from "../budgetItem/budgetItem.repository.js";
+import { getRecurringTransactionByUserAndId } from "../transactionRecurring/transactionRecurring.repository.js";
 import {
   deleteTransaction,
   getTransactionById,
+  getTransactionByUserAndId,
   getTransactionsByUser,
   insertTransaction,
   updateTransaction,
@@ -16,25 +16,18 @@ import {
 import { AccessDeniedException, NotFoundException } from "../../errors.js";
 
 export const createTransaction = async (transaction: InsertTransaction) => {
-  const [account, budget, category, template] = await Promise.all([
+  const [account, budgetItem, template] = await Promise.all([
     getAccountByUserAndId(transaction.userId, transaction.accountId),
-    getBudgetByUserAndId(transaction.userId, transaction.budgetId),
-    transaction.categoryId
-      ? getCategoryByUserAndId(transaction.userId, transaction.categoryId)
-      : Promise.resolve(null),
+    getBudgetItemByUserAndId(transaction.userId, transaction.budgetItemId),
     transaction.recurringTemplateId
-      ? getTransactionRecurringByUserAndId(
+      ? getRecurringTransactionByUserAndId(
           transaction.userId,
           transaction.recurringTemplateId,
         )
       : Promise.resolve(null),
   ]);
 
-  if (!account || !budget) {
-    throw new NotFoundException("Referenced resource not found");
-  }
-
-  if (transaction.categoryId && !category) {
+  if (!account || !budgetItem) {
     throw new NotFoundException("Referenced resource not found");
   }
 
@@ -55,15 +48,41 @@ export const transactionUpdate = async (
   transactionId: string,
   transaction: UpdateTransaction,
 ) => {
-  const foundTransaction = await getTransactionById(transactionId);
+  const foundTransaction = await getTransactionByUserAndId(userId, transactionId);
   if (!foundTransaction) {
+    const existingTransaction = await getTransactionById(transactionId);
+    if (existingTransaction) {
+      throw new AccessDeniedException("Transaction ownership mismatch");
+    }
+
     throw new NotFoundException("Transaction not found");
   }
-  if (foundTransaction.userId !== userId) {
-    throw new AccessDeniedException("Transaction ownership mismatch");
+
+  if (transaction.accountId) {
+    const account = await getAccountByUserAndId(userId, transaction.accountId);
+    if (!account) {
+      throw new AccessDeniedException("Account ownership mismatch");
+    }
   }
 
-  await updateTransaction(transactionId, transaction);
+  if (transaction.budgetItemId) {
+    const budgetItem = await getBudgetItemByUserAndId(userId, transaction.budgetItemId);
+    if (!budgetItem) {
+      throw new AccessDeniedException("Budget item ownership mismatch");
+    }
+  }
+
+  if (transaction.recurringTemplateId) {
+    const template = await getRecurringTransactionByUserAndId(
+      userId,
+      transaction.recurringTemplateId,
+    );
+    if (!template) {
+      throw new AccessDeniedException("Recurring template ownership mismatch");
+    }
+  }
+
+  await updateTransaction(userId, transactionId, transaction);
   return true;
 };
 
@@ -71,14 +90,16 @@ export const removeTransaction = async (
   userId: string,
   transactionId: string,
 ) => {
-  const foundTransaction = await getTransactionById(transactionId);
+  const foundTransaction = await getTransactionByUserAndId(userId, transactionId);
   if (!foundTransaction) {
+    const existingTransaction = await getTransactionById(transactionId);
+    if (existingTransaction) {
+      throw new AccessDeniedException("Transaction ownership mismatch");
+    }
+
     throw new NotFoundException("Transaction not found");
   }
-  if (foundTransaction.userId !== userId) {
-    throw new AccessDeniedException("Transaction ownership mismatch");
-  }
 
-  await deleteTransaction(transactionId);
+  await deleteTransaction(userId, transactionId);
   return true;
 };

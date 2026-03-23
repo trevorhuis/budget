@@ -59,21 +59,43 @@ export const insertBudgetItem = async (
 };
 
 export const updateBudgetItem = async (
+  userId: string,
   budgetItemId: string,
   budgetItem: UpdateBudgetItem,
 ): Promise<void> => {
   await db
     .updateTable("budgetItems")
     .set({
-      name: budgetItem.name,
-      spentAmount: budgetItem.spentAmount,
+      targetAmount: budgetItem.targetAmount,
       actualAmount: budgetItem.actualAmount,
       updatedAt: new Date(),
     })
     .where("id", "=", budgetItemId)
+    .where(({ exists, selectFrom }) =>
+      exists(
+        selectFrom("budgets")
+          .select("budgets.id")
+          .whereRef("budgets.id", "=", "budgetItems.budgetId")
+          .where("budgets.userId", "=", userId),
+      ),
+    )
     .execute();
 };
 
-export const deleteBudgetItem = async (budgetItemId: string): Promise<void> => {
-  await db.deleteFrom("budgetItems").where("id", "=", budgetItemId).execute();
+export const deleteBudgetItem = async (
+  userId: string,
+  budgetItemId: string,
+): Promise<void> => {
+  await db
+    .deleteFrom("budgetItems")
+    .where("id", "=", budgetItemId)
+    .where(({ exists, selectFrom }) =>
+      exists(
+        selectFrom("budgets")
+          .select("budgets.id")
+          .whereRef("budgets.id", "=", "budgetItems.budgetId")
+          .where("budgets.userId", "=", userId),
+      ),
+    )
+    .execute();
 };

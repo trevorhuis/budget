@@ -1,7 +1,9 @@
 import * as z from "zod";
 import { CategoryBase, CategorySchema, IdSchema } from "schemas";
 
-export const UpdateCategorySchema = CategoryBase;
+export const UpdateCategorySchema = CategoryBase.omit({
+  userId: true,
+});
 export const InsertCategorySchema = CategoryBase.extend({
   id: IdSchema,
 });

@@ -27,9 +27,7 @@ export const getBudgetByUserAndId = async (
   return budget ?? null;
 };
 
-export const getBudgetById = async (
-  budgetId: string,
-): Promise<Budget | null> => {
+export const getBudgetById = async (budgetId: string): Promise<Budget | null> => {
   const budget = await db
     .selectFrom("budgets")
     .selectAll()
@@ -53,6 +51,7 @@ export const insertBudget = async (budgetData: InsertBudget): Promise<void> => {
 };
 
 export const updateBudget = async (
+  userId: string,
   budgetId: string,
   budget: UpdateBudget,
 ): Promise<void> => {
@@ -64,9 +63,17 @@ export const updateBudget = async (
       updatedAt: new Date(),
     })
     .where("id", "=", budgetId)
+    .where("userId", "=", userId)
     .execute();
 };
 
-export const deleteBudget = async (budgetId: string): Promise<void> => {
-  await db.deleteFrom("budgets").where("id", "=", budgetId).execute();
+export const deleteBudget = async (
+  userId: string,
+  budgetId: string,
+): Promise<void> => {
+  await db
+    .deleteFrom("budgets")
+    .where("id", "=", budgetId)
+    .where("userId", "=", userId)
+    .execute();
 };

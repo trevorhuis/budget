@@ -3,8 +3,9 @@ import { getBudgetByUserAndId } from "../budget/budget.repository.js";
 import { getCategoryByUserAndId } from "../category/category.repository.js";
 import {
   deleteBudgetItem,
-  getBudgetItemById,
   getBudgetItemsByUser,
+  getBudgetItemById,
+  getBudgetItemByUserAndId,
   insertBudgetItem,
   updateBudgetItem,
 } from "./budgetItem.repository.js";
@@ -36,17 +37,17 @@ export const budgetItemUpdate = async (
   budgetItemId: string,
   budgetItem: UpdateBudgetItem,
 ) => {
-  const foundItem = await getBudgetItemById(budgetItemId);
+  const foundItem = await getBudgetItemByUserAndId(userId, budgetItemId);
   if (!foundItem) {
+    const existingItem = await getBudgetItemById(budgetItemId);
+    if (existingItem) {
+      throw new AccessDeniedException("Budget item ownership mismatch");
+    }
+
     throw new NotFoundException("Budget item not found");
   }
 
-  const budget = await getBudgetByUserAndId(userId, foundItem.budgetId);
-  if (!budget) {
-    throw new AccessDeniedException("Budget ownership mismatch");
-  }
-
-  await updateBudgetItem(budgetItemId, budgetItem);
+  await updateBudgetItem(userId, budgetItemId, budgetItem);
   return true;
 };
 
@@ -54,16 +55,16 @@ export const removeBudgetItem = async (
   userId: string,
   budgetItemId: string,
 ) => {
-  const foundItem = await getBudgetItemById(budgetItemId);
+  const foundItem = await getBudgetItemByUserAndId(userId, budgetItemId);
   if (!foundItem) {
+    const existingItem = await getBudgetItemById(budgetItemId);
+    if (existingItem) {
+      throw new AccessDeniedException("Budget item ownership mismatch");
+    }
+
     throw new NotFoundException("Budget item not found");
   }
 
-  const budget = await getBudgetByUserAndId(userId, foundItem.budgetId);
-  if (!budget) {
-    throw new AccessDeniedException("Budget ownership mismatch");
-  }
-
-  await deleteBudgetItem(budgetItemId);
+  await deleteBudgetItem(userId, budgetItemId);
   return true;
 };
