@@ -6,20 +6,20 @@ import { userMiddleware } from "./user.middleware.js";
 import { getAuthenticatedUserId } from "../utils/auth.utils.js";
 import { validateString } from "../utils/validator.utils.js";
 import {
-  InsertTransactionRecurringSchema,
-  UpdateTransactionRecurringSchema,
+  InsertRecurringTransactionSchema,
+  UpdateRecurringTransactionSchema,
 } from "../core/transactionRecurring/transactionRecurring.model.js";
 import {
-  createTransactionRecurring,
+  createRecurringTransaction,
   readRecurringFromUser,
-  transactionRecurringUpdate,
-  removeTransactionRecurring,
+  recurringTransactionUpdate,
+  removeRecurringTransaction,
 } from "../core/transactionRecurring/transactionRecurring.useCase.js";
 import { NotFoundException, AccessDeniedException } from "../errors.js";
 
-const transactionRecurringRouter = new Hono();
+const recurringTransactionRouter = new Hono();
 
-transactionRecurringRouter.get("/", userMiddleware, async (c) => {
+recurringTransactionRouter.get("/", userMiddleware, async (c) => {
   const userId = await getAuthenticatedUserId(c.var.userId);
   if (!userId) {
     return c.json({ error: "Unauthorized" }, 401);
@@ -37,10 +37,10 @@ transactionRecurringRouter.get("/", userMiddleware, async (c) => {
   }
 });
 
-transactionRecurringRouter.post(
+recurringTransactionRouter.post(
   "/",
   userMiddleware,
-  zValidator("json", InsertTransactionRecurringSchema.omit({ userId: true })),
+  zValidator("json", InsertRecurringTransactionSchema.omit({ userId: true })),
   async (c) => {
     const userId = await getAuthenticatedUserId(c.var.userId);
     if (!userId) {
@@ -49,7 +49,7 @@ transactionRecurringRouter.post(
 
     try {
       const data = c.req.valid("json");
-      await createTransactionRecurring({ ...data, userId });
+      await createRecurringTransaction({ ...data, userId });
 
       return c.json({ success: true }, 201);
     } catch (error) {
@@ -68,10 +68,10 @@ transactionRecurringRouter.post(
   },
 );
 
-transactionRecurringRouter.put(
+recurringTransactionRouter.put(
   "/:templateId",
   userMiddleware,
-  zValidator("json", UpdateTransactionRecurringSchema),
+  zValidator("json", UpdateRecurringTransactionSchema),
   async (c) => {
     const userId = await getAuthenticatedUserId(c.var.userId);
     if (!userId) {
@@ -82,7 +82,7 @@ transactionRecurringRouter.put(
       const templateId = await validateString(c.req.param("templateId"));
       const data = c.req.valid("json");
 
-      await transactionRecurringUpdate(userId, templateId, data);
+      await recurringTransactionUpdate(userId, templateId, data);
 
       return c.json({ success: true }, 201);
     } catch (error) {
@@ -101,7 +101,7 @@ transactionRecurringRouter.put(
   },
 );
 
-transactionRecurringRouter.delete("/:templateId", userMiddleware, async (c) => {
+recurringTransactionRouter.delete("/:templateId", userMiddleware, async (c) => {
   const userId = await getAuthenticatedUserId(c.var.userId);
   if (!userId) {
     return c.json({ error: "Unauthorized" }, 401);
@@ -110,7 +110,7 @@ transactionRecurringRouter.delete("/:templateId", userMiddleware, async (c) => {
   try {
     const templateId = await validateString(c.req.param("templateId"));
 
-    await removeTransactionRecurring(userId, templateId);
+    await removeRecurringTransaction(userId, templateId);
 
     return c.json({ data: { templateId } }, 200);
   } catch (error) {
@@ -128,4 +128,4 @@ transactionRecurringRouter.delete("/:templateId", userMiddleware, async (c) => {
   }
 });
 
-export default transactionRecurringRouter;
+export default recurringTransactionRouter;

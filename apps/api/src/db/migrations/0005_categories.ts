@@ -6,8 +6,10 @@ export async function up(db: Kysely<any>): Promise<void> {
     .ifNotExists()
     .addColumn("id", "uuid", (col) => col.primaryKey())
     .addColumn("name", "varchar(255)", (col) => col.notNull())
-    .addColumn("type", sql`category_type`, (col) => col.notNull())
-    .addColumn("status", sql`category_status`, (col) =>
+    .addColumn("group", "varchar(255)", (col) =>
+      col.notNull().defaultTo("Other"),
+    )
+    .addColumn("status", "varchar(255)", (col) =>
       col.notNull().defaultTo("active"),
     )
     .addColumn("userId", "uuid", (col) => col.notNull())

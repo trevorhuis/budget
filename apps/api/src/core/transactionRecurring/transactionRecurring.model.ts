@@ -1,36 +1,23 @@
 import * as z from "zod";
-import { DatetimeSchema, IdSchema } from "../../utils/model.utils.js";
+import {
+  IdSchema,
+  RecurringTransactionBase,
+  RecurringTransactionSchema,
+} from "schemas";
 
-const TransactionRecurringBase = z.object({
-  merchant: z.string(),
-  amount: z.number(),
-  notes: z.string(),
-});
-
-const TransactionRecurringRelations = z.object({
-  userId: IdSchema,
-  categoryId: IdSchema,
-});
-
-export const TransactionRecurringSchema = z.object({
-  id: IdSchema,
-  ...TransactionRecurringBase.shape,
-  ...TransactionRecurringRelations.shape,
-  ...DatetimeSchema.shape,
-});
-
-export const UpdateTransactionRecurringSchema = TransactionRecurringBase;
-export const InsertTransactionRecurringSchema = TransactionRecurringBase.extend(
+export const UpdateRecurringTransactionSchema = RecurringTransactionBase.omit({
+  userId: true,
+}).partial();
+export const InsertRecurringTransactionSchema = RecurringTransactionBase.extend(
   {
     id: IdSchema,
-    ...TransactionRecurringRelations.shape,
   },
 );
 
-export type TransactionRecurring = z.infer<typeof TransactionRecurringSchema>;
-export type UpdateTransactionRecurring = z.infer<
-  typeof UpdateTransactionRecurringSchema
+export type RecurringTransaction = z.infer<typeof RecurringTransactionSchema>;
+export type UpdateRecurringTransaction = z.infer<
+  typeof UpdateRecurringTransactionSchema
 >;
-export type InsertTransactionRecurring = z.infer<
-  typeof InsertTransactionRecurringSchema
+export type InsertRecurringTransaction = z.infer<
+  typeof InsertRecurringTransactionSchema
 >;

@@ -1,7 +1,9 @@
 import { AccountBase, AccountSchema, IdSchema } from "schemas";
 import * as z from "zod";
 
-export const UpdateAccountSchema = AccountBase;
+export const UpdateAccountSchema = AccountBase.omit({
+  userId: true,
+});
 export const InsertAccountSchema = AccountBase.extend({
   id: IdSchema,
 });

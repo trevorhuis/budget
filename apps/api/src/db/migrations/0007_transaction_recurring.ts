@@ -2,12 +2,13 @@ import { sql, type Kysely } from "kysely";
 
 export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
-    .createTable("transactionRecurring")
+    .createTable("recurringTransaction")
     .ifNotExists()
     .addColumn("id", "uuid", (col) => col.primaryKey())
     .addColumn("merchant", "varchar(255)", (col) => col.notNull())
     .addColumn("amount", "numeric", (col) => col.notNull())
     .addColumn("notes", "text", (col) => col.notNull())
+    .addColumn("recurringDate", "integer", (col) => col.notNull())
     .addColumn("userId", "uuid", (col) => col.notNull())
     .addColumn("categoryId", "uuid", (col) =>
       col.notNull().references("categories.id").onDelete("cascade"),
@@ -22,5 +23,5 @@ export async function up(db: Kysely<any>): Promise<void> {
 }
 
 export async function down(db: Kysely<any>): Promise<void> {
-  await db.schema.dropTable("transactionRecurring").ifExists().execute();
+  await db.schema.dropTable("recurringTransaction").ifExists().execute();
 }

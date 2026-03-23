@@ -1,19 +1,20 @@
 import type {
-  InsertTransactionRecurring,
-  UpdateTransactionRecurring,
+  InsertRecurringTransaction,
+  UpdateRecurringTransaction,
 } from "./transactionRecurring.model.js";
 import { getCategoryByUserAndId } from "../category/category.repository.js";
 import {
-  deleteTransactionRecurring,
-  getTransactionRecurringById,
-  getTransactionRecurringByUser,
-  insertTransactionRecurring,
-  updateTransactionRecurring,
+  deleteRecurringTransaction,
+  getRecurringTransactionById,
+  getRecurringTransactionByUserAndId,
+  getRecurringTransactionByUser,
+  insertRecurringTransaction,
+  updateRecurringTransaction,
 } from "./transactionRecurring.repository.js";
 import { AccessDeniedException, NotFoundException } from "../../errors.js";
 
-export const createTransactionRecurring = async (
-  template: InsertTransactionRecurring,
+export const createRecurringTransaction = async (
+  template: InsertRecurringTransaction,
 ) => {
   const category = await getCategoryByUserAndId(
     template.userId,
@@ -23,45 +24,54 @@ export const createTransactionRecurring = async (
     throw new NotFoundException("Category not found");
   }
 
-  await insertTransactionRecurring(template);
+  await insertRecurringTransaction(template);
   return true;
 };
 
 export const readRecurringFromUser = async (userId: string) => {
-  return await getTransactionRecurringByUser(userId);
+  return await getRecurringTransactionByUser(userId);
 };
 
-export const transactionRecurringUpdate = async (
+export const recurringTransactionUpdate = async (
   userId: string,
   templateId: string,
-  template: UpdateTransactionRecurring,
+  template: UpdateRecurringTransaction,
 ) => {
-  const foundTemplate = await getTransactionRecurringById(templateId);
+  const foundTemplate = await getRecurringTransactionByUserAndId(userId, templateId);
   if (!foundTemplate) {
+    const existingTemplate = await getRecurringTransactionById(templateId);
+    if (existingTemplate) {
+      throw new AccessDeniedException("Recurring template ownership mismatch");
+    }
+
     throw new NotFoundException("Recurring template not found");
   }
 
-  if (foundTemplate.userId !== userId) {
-    throw new AccessDeniedException("Recurring template ownership mismatch");
+  if (template.categoryId) {
+    const category = await getCategoryByUserAndId(userId, template.categoryId);
+    if (!category) {
+      throw new AccessDeniedException("Category ownership mismatch");
+    }
   }
 
-  await updateTransactionRecurring(templateId, template);
+  await updateRecurringTransaction(userId, templateId, template);
   return true;
 };
 
-export const removeTransactionRecurring = async (
+export const removeRecurringTransaction = async (
   userId: string,
   templateId: string,
 ) => {
-  const foundTemplate = await getTransactionRecurringById(templateId);
+  const foundTemplate = await getRecurringTransactionByUserAndId(userId, templateId);
   if (!foundTemplate) {
+    const existingTemplate = await getRecurringTransactionById(templateId);
+    if (existingTemplate) {
+      throw new AccessDeniedException("Recurring template ownership mismatch");
+    }
+
     throw new NotFoundException("Recurring template not found");
   }
 
-  if (foundTemplate.userId !== userId) {
-    throw new AccessDeniedException("Recurring template ownership mismatch");
-  }
-
-  await deleteTransactionRecurring(templateId);
+  await deleteRecurringTransaction(userId, templateId);
   return true;
 };

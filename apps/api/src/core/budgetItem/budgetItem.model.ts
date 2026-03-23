@@ -1,7 +1,10 @@
 import * as z from "zod";
 import { BudgetItemBase, BudgetItemSchema, IdSchema } from "schemas";
 
-export const UpdateBudgetItemSchema = BudgetItemBase;
+export const UpdateBudgetItemSchema = BudgetItemBase.pick({
+  actualAmount: true,
+  targetAmount: true,
+}).partial();
 export const InsertBudgetItemSchema = BudgetItemBase.extend({
   id: IdSchema,
 });

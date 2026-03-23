@@ -59,6 +59,7 @@ export const insertTransaction = async (
 };
 
 export const updateTransaction = async (
+  userId: string,
   transactionId: string,
   transaction: UpdateTransaction,
 ): Promise<void> => {
@@ -68,15 +69,25 @@ export const updateTransaction = async (
       merchant: transaction.merchant,
       amount: transaction.amount,
       notes: transaction.notes,
-      date: transaction.date.toISOString(),
+      type: transaction.type,
+      date: transaction.date?.toISOString(),
+      accountId: transaction.accountId,
+      budgetItemId: transaction.budgetItemId,
+      recurringTemplateId: transaction.recurringTemplateId,
       updatedAt: new Date(),
     })
     .where("id", "=", transactionId)
+    .where("userId", "=", userId)
     .execute();
 };
 
 export const deleteTransaction = async (
+  userId: string,
   transactionId: string,
 ): Promise<void> => {
-  await db.deleteFrom("transactions").where("id", "=", transactionId).execute();
+  await db
+    .deleteFrom("transactions")
+    .where("id", "=", transactionId)
+    .where("userId", "=", userId)
+    .execute();
 };

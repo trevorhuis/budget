@@ -9,18 +9,16 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn("amount", "numeric", (col) => col.notNull())
     .addColumn("notes", "text", (col) => col.notNull())
     .addColumn("date", "timestamptz", (col) => col.notNull())
+    .addColumn("type", "varchar(255)", (col) => col.notNull())
     .addColumn("userId", "uuid", (col) => col.notNull())
     .addColumn("accountId", "uuid", (col) =>
-      col.notNull().references("accounts.id").onDelete("cascade"),
+      col.notNull().references("accounts.id"),
     )
-    .addColumn("budgetId", "uuid", (col) =>
-      col.notNull().references("budgets.id").onDelete("cascade"),
-    )
-    .addColumn("categoryId", "uuid", (col) =>
-      col.notNull().references("categories.id").onDelete("cascade"),
+    .addColumn("budgetItemId", "uuid", (col) =>
+      col.notNull().references("budgetItems.id"),
     )
     .addColumn("recurringTemplateId", "uuid", (col) =>
-      col.references("transactionRecurring.id"),
+      col.references("recurringTransaction.id").onDelete("set null"),
     )
     .addColumn("createdAt", "timestamptz", (col) =>
       col.notNull().defaultTo(sql`now()`),
