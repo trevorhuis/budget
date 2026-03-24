@@ -1,22 +1,6 @@
 {
   "name": "budget",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "format": "prettier . --write",
-    "format:check": "prettier . --check",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
+  "author": "Trevor Huis in 't Veld",
   "license": "ISC",
-  "packageManager": "pnpm@10.32.1",
-  "devDependencies": {
-    "prettier": "3.8.1"
-  },
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ]
+  "packageManager": "pnpm@10.32.1"
 }

@@ -2,7 +2,7 @@ services:
   api:
     build:
       context: .
-      dockerfile: ./apps/api/Dockerfile
+      dockerfile: ./api/Dockerfile
     container_name: budget-api
     depends_on:
       postgres:
