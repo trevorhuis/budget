@@ -3,7 +3,7 @@
 import clsx from "clsx";
 import type React from "react";
 import { createContext, useContext, useState } from "react";
-import { Link } from "./link";
+import { Link } from "~/components/ui/link";
 
 const TableContext = createContext<{
   bleed: boolean;
@@ -23,6 +23,7 @@ export function Table({
   grid = false,
   striped = false,
   className,
+  tableClassName,
   children,
   ...props
 }: {
@@ -30,6 +31,7 @@ export function Table({
   dense?: boolean;
   grid?: boolean;
   striped?: boolean;
+  tableClassName?: string;
 } & React.ComponentPropsWithoutRef<"div">) {
   return (
     <TableContext.Provider
@@ -53,7 +55,12 @@ export function Table({
               !bleed && "sm:px-(--gutter)",
             )}
           >
-            <table className="min-w-full text-left text-sm/6 text-zinc-950 dark:text-white">
+            <table
+              className={clsx(
+                "min-w-full text-left text-sm/6 text-zinc-950 dark:text-white",
+                tableClassName,
+              )}
+            >
               {children}
             </table>
           </div>
@@ -100,7 +107,7 @@ export function TableRow({
   target?: string;
   title?: string;
 } & React.ComponentPropsWithoutRef<"tr">) {
-  let { striped } = useContext(TableContext);
+  const { striped } = useContext(TableContext);
 
   return (
     <TableRowContext.Provider
@@ -127,7 +134,7 @@ export function TableHeader({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"th">) {
-  let { bleed, grid } = useContext(TableContext);
+  const { bleed, grid } = useContext(TableContext);
 
   return (
     <th
@@ -137,7 +144,7 @@ export function TableHeader({
         "border-b border-b-zinc-950/10 px-4 py-2 font-medium first:pl-(--gutter,--spacing(2)) last:pr-(--gutter,--spacing(2)) dark:border-b-white/10",
         grid &&
           "border-l border-l-zinc-950/5 first:border-l-0 dark:border-l-white/5",
-        !bleed && "sm:first:pl-1 sm:last:pr-1",
+        !bleed && "sm:first:pl-4 sm:last:pr-4",
       )}
     />
   );
@@ -148,9 +155,9 @@ export function TableCell({
   children,
   ...props
 }: React.ComponentPropsWithoutRef<"td">) {
-  let { bleed, dense, grid, striped } = useContext(TableContext);
-  let { href, target, title } = useContext(TableRowContext);
-  let [cellRef, setCellRef] = useState<HTMLElement | null>(null);
+  const { bleed, dense, grid, striped } = useContext(TableContext);
+  const { href, target, title } = useContext(TableRowContext);
+  const [cellRef, setCellRef] = useState<HTMLElement | null>(null);
 
   return (
     <td
@@ -163,7 +170,7 @@ export function TableCell({
         grid &&
           "border-l border-l-zinc-950/5 first:border-l-0 dark:border-l-white/5",
         dense ? "py-2.5" : "py-4",
-        !bleed && "sm:first:pl-1 sm:last:pr-1",
+        !bleed && "sm:first:pl-4 sm:last:pr-4",
       )}
     >
       {href && (

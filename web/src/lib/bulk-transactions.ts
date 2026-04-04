@@ -1,6 +1,6 @@
-import type { BudgetItem } from "./schemas";
+import type { BudgetItem } from "~/lib/schemas";
 
-import type { BulkTransactionPreviewRow } from "./api";
+import type { BulkTransactionPreviewRow } from "~/lib/api/transactions";
 
 export type BulkBudgetItemOption = {
   id: BudgetItem["id"];

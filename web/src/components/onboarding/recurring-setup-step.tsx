@@ -1,17 +1,12 @@
 import { PlusIcon, TrashIcon } from "@heroicons/react/20/solid";
 
-import type { OnboardingRecurringDraft } from "../../lib/onboarding";
-import { Button } from "../ui/button";
-import {
-  DescriptionDetails,
-  DescriptionList,
-  DescriptionTerm,
-} from "../ui/description-list";
-import { Input } from "../ui/input";
-import { Select } from "../ui/select";
-import { Subheading } from "../ui/heading";
-import { Text } from "../ui/text";
-import { Textarea } from "../ui/textarea";
+import type { OnboardingRecurringDraft } from "~/lib/onboarding";
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
+import { Select } from "~/components/ui/select";
+import { Subheading } from "~/components/ui/heading";
+import { Text } from "~/components/ui/text";
+import { Textarea } from "~/components/ui/textarea";
 
 type RecurringSetupStepProps = {
   recurringTransactions: OnboardingRecurringDraft[];
@@ -39,36 +34,6 @@ export function RecurringSetupStep({
 }: RecurringSetupStepProps) {
   return (
     <div className="space-y-10">
-      <section className="space-y-5 border-b border-zinc-950/8 pb-8 dark:border-white/10">
-        <div className="space-y-2">
-          <div className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">
-            Step 3
-          </div>
-          <Subheading className="text-xl/8 sm:text-lg/8">
-            Add recurring commitments
-          </Subheading>
-          <Text className="max-w-3xl">
-            These are templates only. No transactions are created yet, but the
-            fixed monthly obligations are preserved from the start.
-          </Text>
-        </div>
-
-        <DescriptionList className="grid gap-x-8 gap-y-3 sm:grid-cols-3">
-          <DescriptionTerm>Recurring templates</DescriptionTerm>
-          <DescriptionDetails>
-            {recurringTransactions.length}
-          </DescriptionDetails>
-
-          <DescriptionTerm>Budget categories ready</DescriptionTerm>
-          <DescriptionDetails>{categoryOptions.length}</DescriptionDetails>
-
-          <DescriptionTerm>Optional</DescriptionTerm>
-          <DescriptionDetails>
-            Leave this empty if you want to add them later.
-          </DescriptionDetails>
-        </DescriptionList>
-      </section>
-
       <section className="space-y-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div className="space-y-2">

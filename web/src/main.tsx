@@ -1,38 +1,19 @@
-import { StrictMode, useEffect } from "react";
+import { Suspense, StrictMode, lazy } from "react";
 import { createRoot } from "react-dom/client";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { createRouter, RouterProvider } from "@tanstack/react-router";
 
-import { routeTree } from "./routeTree.gen";
 import "./index.css";
-import { AuthProvider, useAuth } from "./lib/auth";
-import { queryClient } from "./lib/integrations/queryClient";
+import { AppRouter } from "~/app-router";
+import { AuthProvider } from "~/lib/auth";
+import { queryClient } from "~/lib/integrations/queryClient";
 
-const router = createRouter({
-  routeTree,
-  defaultPreload: "intent",
-  scrollRestoration: true,
-  context: {
-    auth: undefined!,
-  },
-});
-
-declare module "@tanstack/react-router" {
-  interface Register {
-    router: typeof router;
-  }
-}
-
-function AppRouter() {
-  const auth = useAuth();
-
-  useEffect(() => {
-    void router.invalidate();
-  }, [auth.isAuthenticated, auth.isReady, auth.user?.id]);
-
-  return <RouterProvider router={router} context={{ auth }} />;
-}
+const ReactQueryDevtools = import.meta.env.DEV
+  ? lazy(() =>
+      import("@tanstack/react-query-devtools").then((module) => ({
+        default: module.ReactQueryDevtools,
+      })),
+    )
+  : null;
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -40,7 +21,11 @@ createRoot(document.getElementById("root")!).render(
       <AuthProvider>
         <AppRouter />
       </AuthProvider>
-      <ReactQueryDevtools initialIsOpen={false} />
+      {ReactQueryDevtools ? (
+        <Suspense fallback={null}>
+          <ReactQueryDevtools initialIsOpen={false} />
+        </Suspense>
+      ) : null}
     </QueryClientProvider>
   </StrictMode>,
 );

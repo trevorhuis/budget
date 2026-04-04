@@ -1,23 +1,21 @@
+/* eslint-disable react-refresh/only-export-components */
+
+import { ExclamationCircleIcon } from "@heroicons/react/20/solid";
 import { useState } from "react";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
-import { AuthLayout } from "../components/ui/auth-layout";
-import { Button } from "../components/ui/button";
-import {
-  Field,
-  FieldGroup,
-  Fieldset,
-  Label,
-} from "../components/ui/fieldset";
-import { Input } from "../components/ui/input";
-import { Text, TextLink } from "../components/ui/text";
+import { AuthLayout } from "~/components/ui/auth-layout";
+import { FieldGroup, Fieldset } from "~/components/ui/fieldset";
+import { Text, TextLink } from "~/components/ui/text";
 import {
   getAbsoluteCallbackURL,
   resolveAuthSession,
   sanitizeRedirect,
   useAuth,
-} from "../lib/auth";
-import { authClient } from "../lib/auth-client";
+} from "~/lib/auth";
+import { authClient } from "~/lib/auth-client";
+import { useAppForm } from "~/hooks/form";
+import * as z from "zod/mini";
 
 export const Route = createFileRoute("/login")({
   validateSearch: (search) => ({
@@ -38,29 +36,44 @@ export const Route = createFileRoute("/login")({
 function LoginPage() {
   const auth = useAuth();
   const search = Route.useSearch();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const registerHref = `/register?redirect=${encodeURIComponent(
     search.redirect,
   )}`;
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const form = useAppForm({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+    listeners: {
+      onChange: () => {
+        setErrorMessage(null);
+      },
+    },
+    validators: {
+      // Form-level onChange runs on every field edit; allow empty email until submit.
+      onChange: z.object({
+        email: z.union([
+          z.literal(""),
+          z.email("Enter a valid email address."),
+        ]),
+        password: z.string(),
+      }),
+      onSubmit: z.object({
+        email: z.email("Enter a valid email address."),
+        password: z
+          .string()
+          .check(z.minLength(1, "Password is required.")),
+      }),
+    },
+    onSubmit: async ({ value }) => {
+      setErrorMessage(null);
 
-    if (isSubmitting) {
-      return;
-    }
-
-    setErrorMessage(null);
-    setIsSubmitting(true);
-
-    try {
       const result = await authClient.signIn.email({
-        email: email.trim(),
-        password,
+        email: value.email.trim(),
+        password: value.password,
         callbackURL: getAbsoluteCallbackURL(search.redirect),
       });
 
@@ -71,65 +84,75 @@ function LoginPage() {
 
       await auth.refetch();
       window.location.assign(search.redirect);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+    },
+  });
 
   return (
     <AuthLayout
-      eyebrow="Budget workspace"
-      title="Sign in to your month"
-      description="Your session unlocks account balances, budget lines, recurring transactions, and the assistant."
+      eyebrow="Welcome back"
+      title="Sign in"
+      description="Pick up where you left off—accounts, your monthly budget, imports, and chat are all one sign-in away."
       footer={
         <Text>
-          New here? <TextLink href={registerHref}>Create an account</TextLink>
+          New here?{" "}
+          <TextLink href={registerHref}>Create an account</TextLink>
         </Text>
       }
     >
-      <form className="space-y-8" onSubmit={handleSubmit}>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          form.handleSubmit();
+        }}
+        className="space-y-6"
+      >
         <Fieldset>
           <FieldGroup>
-            <Field>
-              <Label>Email</Label>
-              <Input
-                autoComplete="email"
-                name="email"
-                type="email"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                required
-              />
-            </Field>
+            <form.AppField name="email">
+              {(field) => (
+                <field.TextField
+                  autoComplete="email"
+                  autoFocus
+                  label="Email"
+                  placeholder="you@example.com"
+                  type="email"
+                />
+              )}
+            </form.AppField>
 
-            <Field>
-              <Label>Password</Label>
-              <Input
-                autoComplete="current-password"
-                name="password"
-                type="password"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                required
-              />
-            </Field>
+            <form.AppField name="password">
+              {(field) => (
+                <field.TextField
+                  autoComplete="current-password"
+                  label="Password"
+                  placeholder="••••••••"
+                  type="password"
+                />
+              )}
+            </form.AppField>
           </FieldGroup>
         </Fieldset>
 
         {errorMessage ? (
-          <p className="text-sm/6 text-red-600 dark:text-red-400">
-            {errorMessage}
-          </p>
+          <div
+            role="alert"
+            className="flex gap-3 rounded-xl border border-red-200/90 bg-red-50/95 p-3.5 text-sm text-red-900 shadow-sm dark:border-red-500/30 dark:bg-red-950/50 dark:text-red-100"
+          >
+            <ExclamationCircleIcon
+              className="size-5 shrink-0 text-red-600 dark:text-red-400"
+              aria-hidden
+            />
+            <p className="min-w-0 pt-0.5 leading-snug">{errorMessage}</p>
+          </div>
         ) : null}
 
-        <Button
-          type="submit"
-          color="emerald"
-          className="w-full justify-center"
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? "Signing in..." : "Sign in"}
-        </Button>
+        <div className="border-t border-zinc-950/8 pt-6 dark:border-white/10">
+          <form.AppForm>
+            <div className="flex flex-col gap-3 [&_button]:w-full">
+              <form.SubscribeButton color="emerald" label="Sign in" />
+            </div>
+          </form.AppForm>
+        </div>
       </form>
     </AuthLayout>
   );

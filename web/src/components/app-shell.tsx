@@ -1,122 +1,102 @@
 import {
   ArrowPathRoundedSquareIcon,
   ArrowRightStartOnRectangleIcon,
-  ArrowsRightLeftIcon,
   BanknotesIcon,
   ChatBubbleLeftRightIcon,
-  ChevronDownIcon,
   CreditCardIcon,
   DocumentArrowUpIcon,
   Squares2X2Icon,
 } from "@heroicons/react/20/solid";
 import { Outlet, useRouterState } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, type ComponentType, type SVGProps } from "react";
 
-import { useAuth } from "../lib/auth";
-import { Avatar } from "./ui/avatar";
+import { useAuth } from "~/lib/auth";
+import { Avatar } from "~/components/ui/avatar";
 import {
   Dropdown,
   DropdownButton,
-  DropdownDescription,
   DropdownDivider,
   DropdownHeader,
   DropdownItem,
   DropdownLabel,
   DropdownMenu,
   DropdownSection,
-} from "./ui/dropdown";
+} from "~/components/ui/dropdown";
 import {
   Navbar,
   NavbarItem,
   NavbarLabel,
   NavbarSection,
   NavbarSpacer,
-} from "./ui/navbar";
+} from "~/components/ui/navbar";
 import {
   Sidebar,
   SidebarBody,
   SidebarFooter,
   SidebarHeader,
-  SidebarHeading,
   SidebarItem,
   SidebarLabel,
   SidebarSection,
   SidebarSpacer,
-} from "./ui/sidebar";
-import { StackedLayout } from "./ui/stacked-layout";
-import { Text } from "./ui/text";
+} from "~/components/ui/sidebar";
+import { StackedLayout } from "~/components/ui/stacked-layout";
+import { Text } from "~/components/ui/text";
 
-const navItems = [
+const isCalculatorPath = (pathname: string) =>
+  pathname === "/calculators" || pathname.startsWith("/calculators/");
+
+const isPrimaryTransactionsPath = (pathname: string) =>
+  pathname === "/transactions" ||
+  (pathname.startsWith("/transactions/") &&
+    !pathname.startsWith("/transactions/bulk"));
+
+type AppNavLink = {
+  label: string;
+  to: string;
+  icon: ComponentType<SVGProps<SVGSVGElement>>;
+  title?: string;
+  isCurrent: (pathname: string) => boolean;
+};
+
+const appNavLinks: AppNavLink[] = [
   {
     label: "Budget",
     to: "/budget",
     icon: BanknotesIcon,
+    isCurrent: (pathname) => pathname === "/budget",
+  },
+  {
+    label: "Transactions",
+    to: "/transactions",
+    icon: ArrowPathRoundedSquareIcon,
+    isCurrent: isPrimaryTransactionsPath,
+  },
+  {
+    label: "Import",
+    to: "/transactions/bulk",
+    icon: DocumentArrowUpIcon,
+    title: "Upload, review, and import a CSV batch",
+    isCurrent: (pathname) => pathname.startsWith("/transactions/bulk"),
   },
   {
     label: "Accounts",
     to: "/accounts",
     icon: CreditCardIcon,
+    isCurrent: (pathname) => pathname === "/accounts",
   },
   {
     label: "Chat",
     to: "/chat",
     icon: ChatBubbleLeftRightIcon,
-  },
-] as const;
-
-const transactionNavItems = [
-  {
-    label: "Primary",
-    description: "Create and review individual transactions.",
-    to: "/transactions",
-    icon: ArrowPathRoundedSquareIcon,
+    isCurrent: (pathname) => pathname === "/chat",
   },
   {
-    label: "Bulk",
-    description: "Upload, review, and import a CSV batch.",
-    to: "/transactions/bulk",
-    icon: DocumentArrowUpIcon,
-  },
-] as const;
-
-const calculatorNavItems = [
-  {
-    label: "Mortgage",
-    description: "PITI, amortization, and a simple adjustable-rate model.",
-    to: "/calculators/mortgage",
-    icon: BanknotesIcon,
-  },
-  {
-    label: "Loan",
-    description: "APR with fees, payoff schedule, and payment summary.",
-    to: "/calculators/loan",
-    icon: CreditCardIcon,
-  },
-  {
-    label: "Debt Payoff",
-    description: "Payoff date, interest saved, and the accelerator effect.",
-    to: "/calculators/debt-payoff",
-    icon: ArrowPathRoundedSquareIcon,
-  },
-  {
-    label: "Saved Scenarios",
-    description: "Review saved sessions, duplicate them, and branch ideas.",
+    label: "Calculators",
     to: "/calculators",
     icon: Squares2X2Icon,
+    isCurrent: isCalculatorPath,
   },
-  {
-    label: "Compare",
-    description: "Put two saved scenarios side by side.",
-    to: "/calculators/compare",
-    icon: ArrowsRightLeftIcon,
-  },
-] as const;
-
-const isTransactionPath = (pathname: string) =>
-  pathname === "/transactions" || pathname.startsWith("/transactions/");
-
-const isCalculatorPath = (pathname: string) =>
-  pathname === "/calculators" || pathname.startsWith("/calculators/");
+];
 
 const getUserInitials = (value: string) =>
   value
@@ -165,89 +145,24 @@ export function AppShell() {
           </NavbarSection>
           <NavbarSpacer />
           <NavbarSection className="max-lg:hidden">
-            {navItems.slice(0, 1).map(({ icon: Icon, label, to }) => (
-              <NavbarItem key={to} href={to} current={pathname === to}>
+            {appNavLinks.map(({ icon: Icon, isCurrent, label, title, to }) => (
+              <NavbarItem
+                key={to}
+                href={to}
+                title={title}
+                current={isCurrent(pathname)}
+              >
                 <Icon />
                 <NavbarLabel>{label}</NavbarLabel>
               </NavbarItem>
             ))}
-            <div className="flex items-center gap-1">
-              <NavbarItem
-                href="/transactions"
-                current={isTransactionPath(pathname)}
-              >
-                <ArrowPathRoundedSquareIcon />
-                <NavbarLabel>Transactions</NavbarLabel>
-              </NavbarItem>
-              <Dropdown>
-                <DropdownButton
-                  as={NavbarItem}
-                  aria-label="Open transactions navigation"
-                >
-                  <ChevronDownIcon />
-                </DropdownButton>
-                <DropdownMenu anchor="bottom end">
-                  <DropdownSection>
-                    {transactionNavItems.map(
-                      ({ description, icon: Icon, label, to }) => (
-                        <DropdownItem key={to} href={to}>
-                          <Icon />
-                          <DropdownLabel>{label}</DropdownLabel>
-                          <DropdownDescription>
-                            {description}
-                          </DropdownDescription>
-                        </DropdownItem>
-                      ),
-                    )}
-                  </DropdownSection>
-                </DropdownMenu>
-              </Dropdown>
-            </div>
-            {navItems.slice(1).map(({ icon: Icon, label, to }) => (
-              <NavbarItem key={to} href={to} current={pathname === to}>
-                <Icon />
-                <NavbarLabel>{label}</NavbarLabel>
-              </NavbarItem>
-            ))}
-            <div className="flex items-center gap-1">
-              <NavbarItem
-                href="/calculators"
-                current={isCalculatorPath(pathname)}
-              >
-                <Squares2X2Icon />
-                <NavbarLabel>Calculators</NavbarLabel>
-              </NavbarItem>
-              <Dropdown>
-                <DropdownButton
-                  as={NavbarItem}
-                  aria-label="Open calculators navigation"
-                >
-                  <ChevronDownIcon />
-                </DropdownButton>
-                <DropdownMenu anchor="bottom end">
-                  <DropdownSection>
-                    {calculatorNavItems.map(
-                      ({ description, icon: Icon, label, to }) => (
-                        <DropdownItem key={to} href={to}>
-                          <Icon />
-                          <DropdownLabel>{label}</DropdownLabel>
-                          <DropdownDescription>
-                            {description}
-                          </DropdownDescription>
-                        </DropdownItem>
-                      ),
-                    )}
-                  </DropdownSection>
-                </DropdownMenu>
-              </Dropdown>
-            </div>
           </NavbarSection>
           <NavbarSection>
             <Dropdown>
               <DropdownButton
                 as="button"
-                aria-label="Open account menu"
-                className="flex items-center gap-3 rounded-full border border-zinc-950/10 bg-white/85 px-2 py-1.5 shadow-sm transition hover:border-zinc-950/20 dark:border-white/10 dark:bg-white/5 dark:hover:border-white/20"
+                aria-label={`Account menu for ${displayName}`}
+                className="rounded-full border border-zinc-950/10 bg-white/85 p-0.5 shadow-sm transition hover:border-zinc-950/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:border-white/10 dark:bg-white/5 dark:hover:border-white/25"
               >
                 <Avatar
                   className="size-9 bg-zinc-950 text-white dark:bg-white dark:text-zinc-950"
@@ -255,15 +170,6 @@ export function AppShell() {
                   alt={displayName}
                   src={user?.image}
                 />
-                <div className="hidden text-left lg:block">
-                  <div className="text-sm font-semibold text-zinc-950 dark:text-white">
-                    {displayName}
-                  </div>
-                  <div className="text-xs text-zinc-500 dark:text-zinc-400">
-                    {user?.email}
-                  </div>
-                </div>
-                <ChevronDownIcon className="size-4 text-zinc-500 dark:text-zinc-400" />
               </DropdownButton>
               <DropdownMenu anchor="bottom end">
                 <DropdownHeader>
@@ -279,9 +185,6 @@ export function AppShell() {
                     <DropdownLabel>
                       {isSigningOut ? "Signing out..." : "Sign out"}
                     </DropdownLabel>
-                    <DropdownDescription>
-                      End this session and return to the login screen.
-                    </DropdownDescription>
                   </DropdownItem>
                 </DropdownSection>
               </DropdownMenu>
@@ -293,47 +196,26 @@ export function AppShell() {
         <Sidebar>
           <SidebarHeader>
             <div className="px-2 py-2">
-              <div className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">
-                Budget
+              <div className="flex items-center rounded-lg p-2">
+                <span className="rounded-md bg-zinc-950 px-2 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-white dark:bg-white dark:text-zinc-950">
+                  Budget
+                </span>
               </div>
             </div>
           </SidebarHeader>
           <SidebarBody>
-            <SidebarSection>
-              {navItems.slice(0, 1).map(({ icon: Icon, label, to }) => (
-                <SidebarItem key={to} href={to} current={pathname === to}>
+            <SidebarSection className="gap-1">
+              {appNavLinks.map(({ icon: Icon, isCurrent, label, title, to }) => (
+                <SidebarItem
+                  key={to}
+                  href={to}
+                  title={title}
+                  current={isCurrent(pathname)}
+                >
                   <Icon />
                   <SidebarLabel>{label}</SidebarLabel>
                 </SidebarItem>
               ))}
-              <div className="space-y-1 pt-2">
-                <SidebarHeading>Transactions</SidebarHeading>
-                <div className="ml-2 space-y-0.5 border-l border-zinc-950/8 pl-2 dark:border-white/10">
-                  {transactionNavItems.map(({ icon: Icon, label, to }) => (
-                    <SidebarItem key={to} href={to} current={pathname === to}>
-                      <Icon />
-                      <SidebarLabel>{label}</SidebarLabel>
-                    </SidebarItem>
-                  ))}
-                </div>
-              </div>
-              {navItems.slice(1).map(({ icon: Icon, label, to }) => (
-                <SidebarItem key={to} href={to} current={pathname === to}>
-                  <Icon />
-                  <SidebarLabel>{label}</SidebarLabel>
-                </SidebarItem>
-              ))}
-              <div className="space-y-1 pt-2">
-                <SidebarHeading>Calculators</SidebarHeading>
-                <div className="ml-2 space-y-0.5 border-l border-zinc-950/8 pl-2 dark:border-white/10">
-                  {calculatorNavItems.map(({ icon: Icon, label, to }) => (
-                    <SidebarItem key={to} href={to} current={pathname === to}>
-                      <Icon />
-                      <SidebarLabel>{label}</SidebarLabel>
-                    </SidebarItem>
-                  ))}
-                </div>
-              </div>
             </SidebarSection>
             <SidebarSpacer />
           </SidebarBody>

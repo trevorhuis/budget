@@ -16,6 +16,10 @@ skills:
 
 # Budget Agent Guide
 
+## Development environment
+
+End-to-end local setup (prerequisites, `api/.env`, Postgres, migrations, dev servers, schema sync) lives in **`docs/DEVELOPMENT.md`**. Read that file before running installs, migrations, or both apps together.
+
 ## Current repo shape
 
 - This checkout is in the middle of a flattening refactor from `apps/api` and `apps/web` to `api` and `web`.

@@ -3,9 +3,9 @@ import { queryCollectionOptions } from "@tanstack/query-db-collection";
 import {
   RecurringTransactionSchema,
   type RecurringTransaction,
-} from "../schemas";
-import { API } from "../api";
-import { queryClient } from "../integrations/queryClient";
+} from "~/lib/schemas";
+import { recurringTransactionsApi } from "~/lib/api/recurringTransactions";
+import { queryClient } from "~/lib/integrations/queryClient";
 
 const normalizeRecurringTransaction = (
   recurringTransaction: RecurringTransaction,
@@ -36,13 +36,13 @@ export const recurringTransactionCollection = createCollection(
     queryKey: ["recurringTransactions"],
     getKey: (recurringTransaction) => recurringTransaction.id,
     queryFn: async () => {
-      const { data } = await API.recurringTransactions.fetch();
+      const { data } = await recurringTransactionsApi.fetch();
       return data.map(normalizeRecurringTransaction);
     },
     onUpdate: async ({ transaction }) => {
       const { modified, original } = transaction.mutations[0];
 
-      await API.recurringTransactions.update(
+      await recurringTransactionsApi.update(
         original.id,
         normalizeRecurringTransactionUpdate(modified),
       );
@@ -50,7 +50,7 @@ export const recurringTransactionCollection = createCollection(
     onDelete: async ({ transaction }) => {
       const item = transaction.mutations[0].modified;
 
-      await API.recurringTransactions.delete(item.id);
+      await recurringTransactionsApi.delete(item.id);
     },
   }),
 );

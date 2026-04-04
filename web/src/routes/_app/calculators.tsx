@@ -1,5 +1,6 @@
 import { Outlet, createFileRoute, useRouterState } from "@tanstack/react-router";
-import { CalculatorDashboard } from "../../components/calculator-workspaces";
+
+import { CalculatorDashboard } from "~/components/calculators/calculator-dashboard";
 
 export const Route = createFileRoute("/_app/calculators")({
   component: function CalculatorsRouteComponent() {

@@ -4,24 +4,20 @@ import {
   type Calculator,
   CalculatorSchema,
   type JsonObject,
-} from '../schemas'
+} from '~/lib/schemas'
 import { uuidv7 } from 'uuidv7'
 
-import { API } from '../api'
-import { queryClient } from '../integrations/queryClient'
+import {
+  calculatorsApi,
+  normalizeCalculator,
+} from '~/lib/api/calculators'
+import { queryClient } from '~/lib/integrations/queryClient'
 
 type CreateCalculatorInput = {
   name: string
   calculatorType: Calculator['calculatorType']
   data: JsonObject
 }
-
-const normalizeCalculator = (calculator: Calculator) => ({
-  ...calculator,
-  shareToken: calculator.shareToken ?? null,
-  createdAt: calculator.createdAt ? new Date(calculator.createdAt) : undefined,
-  updatedAt: calculator.updatedAt ? new Date(calculator.updatedAt) : undefined,
-})
 
 const normalizeCalculatorUpdate = (calculator: Calculator) => ({
   name: calculator.name,
@@ -36,16 +32,16 @@ export const calculatorCollection = createCollection(
     queryKey: ['calculators'],
     getKey: (calculator) => calculator.id,
     queryFn: async () => {
-      const { data } = await API.calculators.fetch()
+      const { data } = await calculatorsApi.fetch()
       return data.map(normalizeCalculator)
     },
     onUpdate: async ({ transaction }) => {
       const { modified, original } = transaction.mutations[0]
-      await API.calculators.update(original.id, normalizeCalculatorUpdate(modified))
+      await calculatorsApi.update(original.id, normalizeCalculatorUpdate(modified))
     },
     onDelete: async ({ transaction }) => {
       const item = transaction.mutations[0].modified
-      await API.calculators.delete(item.id)
+      await calculatorsApi.delete(item.id)
     },
   })
 )
@@ -57,7 +53,7 @@ export const createCalculatorScenario = async ({
 }: CreateCalculatorInput) => {
   const id = uuidv7()
 
-  await API.calculators.create({
+  await calculatorsApi.create({
     id,
     calculatorType,
     data,
@@ -70,18 +66,18 @@ export const createCalculatorScenario = async ({
 }
 
 export const duplicateCalculatorScenario = async (calculatorId: string) => {
-  const response = await API.calculators.duplicate(calculatorId)
+  const response = await calculatorsApi.duplicate(calculatorId)
   await calculatorCollection.utils.refetch()
   return response.data
 }
 
 export const shareCalculatorScenario = async (calculatorId: string) => {
-  const response = await API.calculators.share(calculatorId)
+  const response = await calculatorsApi.share(calculatorId)
   await calculatorCollection.utils.refetch()
   return response.data.shareToken
 }
 
 export const unshareCalculatorScenario = async (calculatorId: string) => {
-  await API.calculators.unshare(calculatorId)
+  await calculatorsApi.unshare(calculatorId)
   await calculatorCollection.utils.refetch()
 }

@@ -1,31 +1,27 @@
-import { PlusIcon, TrashIcon } from "@heroicons/react/20/solid";
+import {
+  Bars3Icon,
+  CheckIcon,
+  PlusIcon,
+  TrashIcon,
+} from "@heroicons/react/20/solid";
+import { type DragEvent, type FormEvent, useState } from "react";
 
 import type {
   OnboardingBudgetItemDraft,
   OnboardingPack,
-} from "../../lib/onboarding";
-import { onboardingBudgetPacks } from "../../lib/onboarding";
-import { Badge } from "../ui/badge";
-import { Button } from "../ui/button";
-import { Checkbox } from "../ui/checkbox";
-import {
-  DescriptionDetails,
-  DescriptionList,
-  DescriptionTerm,
-} from "../ui/description-list";
-import { Input } from "../ui/input";
-import { Subheading } from "../ui/heading";
-import { Text } from "../ui/text";
+} from "~/lib/onboarding";
+import { onboardingBudgetPacks } from "~/lib/onboarding";
+import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
+import { Subheading } from "~/components/ui/heading";
+import { Text } from "~/components/ui/text";
 
 type BudgetSetupStepProps = {
-  monthLabel: string;
   coreItems: OnboardingBudgetItemDraft[];
   customItems: OnboardingBudgetItemDraft[];
   packItems: Record<string, OnboardingBudgetItemDraft[]>;
   selectedPackIds: string[];
-  selectedCount: number;
-  plannedIncome: string;
-  plannedExpenses: string;
   error: string | null;
   onTogglePack: (packId: string) => void;
   onUpdateCoreItem: (
@@ -44,27 +40,30 @@ type BudgetSetupStepProps = {
     field: "name" | "group" | "targetAmount" | "enabled",
     value: string | boolean,
   ) => void;
-  onAddCustomItem: () => void;
-  onRemoveCustomItem: (itemId: string) => void;
+  onAddCustomItem: (groupName: string) => void;
+  onAddGroup: (groupName: string) => void;
+  onDeleteItem: (itemId: string) => void;
+  onMoveItemToGroup: (itemId: string, groupName: string) => void;
 };
 
 export function BudgetSetupStep({
-  monthLabel,
   coreItems,
   customItems,
   packItems,
   selectedPackIds,
-  selectedCount,
-  plannedIncome,
-  plannedExpenses,
   error,
   onTogglePack,
   onUpdateCoreItem,
   onUpdatePackItem,
   onUpdateCustomItem,
   onAddCustomItem,
-  onRemoveCustomItem,
+  onAddGroup,
+  onDeleteItem,
+  onMoveItemToGroup,
 }: BudgetSetupStepProps) {
+  const [newGroupName, setNewGroupName] = useState("");
+  const [draggedItemId, setDraggedItemId] = useState<string | null>(null);
+  const [dropTargetGroup, setDropTargetGroup] = useState<string | null>(null);
   const selectedPackItems = onboardingBudgetPacks.flatMap((pack) =>
     selectedPackIds.includes(pack.id) ? (packItems[pack.id] ?? []) : [],
   );
@@ -72,38 +71,56 @@ export function BudgetSetupStep({
     ...coreItems,
     ...selectedPackItems,
     ...customItems,
-  ]);
+  ].filter((item) => item.enabled));
+
+  const handleAddGroup = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const groupName = newGroupName.trim();
+
+    if (!groupName) {
+      return;
+    }
+
+    onAddGroup(groupName);
+    setNewGroupName("");
+  };
+
+  const handleSectionDragOver = (
+    event: DragEvent<HTMLDivElement>,
+    groupName: string,
+  ) => {
+    if (!draggedItemId) {
+      return;
+    }
+
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+
+    if (dropTargetGroup !== groupName) {
+      setDropTargetGroup(groupName);
+    }
+  };
+
+  const handleSectionDrop = (
+    event: DragEvent<HTMLDivElement>,
+    groupName: string,
+  ) => {
+    event.preventDefault();
+
+    const itemId =
+      draggedItemId || event.dataTransfer.getData("text/plain") || null;
+
+    if (itemId) {
+      onMoveItemToGroup(itemId, groupName);
+    }
+
+    setDraggedItemId(null);
+    setDropTargetGroup(null);
+  };
 
   return (
     <div className="space-y-10">
-      <section className="space-y-5 border-b border-zinc-950/8 pb-8 dark:border-white/10">
-        <div className="space-y-2">
-          <div className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">
-            Step 1
-          </div>
-          <Subheading className="text-xl/8 sm:text-lg/8">
-            Shape the first budget for {monthLabel}
-          </Subheading>
-          <Text className="max-w-3xl">
-            Start with the common monthly lines, then layer on packs for life
-            situations you already know belong in the plan.
-          </Text>
-        </div>
-
-        <DescriptionList className="grid gap-x-8 gap-y-3 sm:grid-cols-3">
-          <DescriptionTerm>Budget items</DescriptionTerm>
-          <DescriptionDetails>{selectedCount}</DescriptionDetails>
-
-          <DescriptionTerm>Planned income</DescriptionTerm>
-          <DescriptionDetails className="font-medium text-emerald-600 dark:text-emerald-400">
-            {plannedIncome}
-          </DescriptionDetails>
-
-          <DescriptionTerm>Planned expenses</DescriptionTerm>
-          <DescriptionDetails>{plannedExpenses}</DescriptionDetails>
-        </DescriptionList>
-      </section>
-
       <section className="space-y-5 border-b border-zinc-950/8 pb-8 dark:border-white/10">
         <div className="space-y-2">
           <Subheading>Packs</Subheading>
@@ -113,55 +130,60 @@ export function BudgetSetupStep({
           </Text>
         </div>
 
-        <div className="flex flex-wrap gap-3">
-          {onboardingBudgetPacks.map((pack) => {
-            const selected = selectedPackIds.includes(pack.id);
-
-            return (
-              <button
-                key={pack.id}
-                type="button"
-                onClick={() => onTogglePack(pack.id)}
-                className={[
-                  "inline-flex items-center gap-3 rounded-full border px-4 py-2 text-left transition",
-                  selected
-                    ? "border-zinc-950 bg-zinc-950 text-white dark:border-white dark:bg-white dark:text-zinc-950"
-                    : "border-zinc-950/10 bg-white/80 text-zinc-950 hover:border-zinc-950/20 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:border-white/20",
-                ].join(" ")}
-              >
-                <span className="text-sm font-semibold">{pack.name}</span>
-                <Badge color={selected ? "zinc" : pack.accent}>
-                  {pack.items.length} lines
-                </Badge>
-              </button>
-            );
-          })}
-        </div>
-
         <div className="grid gap-3 lg:grid-cols-2">
           {onboardingBudgetPacks.map((pack) => (
-            <PackDescription
+            <PackOption
               key={pack.id}
               pack={pack}
               isSelected={selectedPackIds.includes(pack.id)}
+              onToggle={() => onTogglePack(pack.id)}
             />
           ))}
         </div>
       </section>
 
       <section className="space-y-5">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div className="space-y-4">
           <div className="space-y-2">
             <Subheading>Budget lines</Subheading>
             <Text>
-              Adjust names, groups, and target amounts now. Uncheck anything
-              that should stay out of the first month.
+              Adjust names and target amounts, drag lines between groups to
+              reassign them, and delete anything that should stay out of the
+              first month.
             </Text>
           </div>
-          <Button plain onClick={onAddCustomItem}>
-            <PlusIcon data-slot="icon" />
-            Add custom line
-          </Button>
+          <form
+            onSubmit={handleAddGroup}
+            className="rounded-[1.5rem] border border-zinc-950/8 bg-white/80 px-4 py-4 dark:border-white/10 dark:bg-white/[0.04]"
+          >
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+              <div className="max-w-sm space-y-1">
+                <div className="text-sm font-semibold text-zinc-950 dark:text-white">
+                  Create a new group
+                </div>
+                <Text>
+                  Start a fresh section with one default budget line.
+                </Text>
+              </div>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center lg:min-w-[28rem]">
+                <Input
+                  className="sm:flex-1"
+                  value={newGroupName}
+                  onChange={(event) => setNewGroupName(event.target.value)}
+                  placeholder="Subscriptions"
+                  aria-label="New budget group name"
+                />
+                <Button
+                  type="submit"
+                  disabled={!newGroupName.trim()}
+                  className="justify-center whitespace-nowrap sm:min-w-32"
+                >
+                  <PlusIcon data-slot="icon" />
+                  Add group
+                </Button>
+              </div>
+            </div>
+          </form>
         </div>
 
         {error ? (
@@ -169,10 +191,9 @@ export function BudgetSetupStep({
         ) : null}
 
         <div className="overflow-hidden rounded-[1.75rem] border border-zinc-950/8 bg-white/75 dark:border-white/10 dark:bg-white/4">
-          <div className="hidden grid-cols-[2.75rem_minmax(0,2fr)_minmax(0,1.2fr)_9rem_5rem] gap-4 border-b border-zinc-950/8 px-5 py-3 text-xs font-semibold uppercase tracking-[0.16em] text-zinc-500 lg:grid dark:border-white/10 dark:text-zinc-400">
+          <div className="hidden grid-cols-[2rem_minmax(0,1.9fr)_10rem_5.5rem] gap-4 border-b border-zinc-950/8 px-5 py-3 text-xs font-semibold uppercase tracking-[0.16em] text-zinc-500 lg:grid dark:border-white/10 dark:text-zinc-400">
             <div />
             <div>Category</div>
-            <div>Group</div>
             <div>Target</div>
             <div />
           </div>
@@ -184,16 +205,49 @@ export function BudgetSetupStep({
                 className="border-b border-zinc-950/8 last:border-b-0 dark:border-white/10"
               >
                 <div className="flex items-center justify-between gap-3 bg-zinc-950/[0.025] px-5 py-3 dark:bg-white/[0.03]">
-                  <div className="text-sm font-semibold text-zinc-950 dark:text-white">
-                    {section.group}
+                  <div className="flex items-center gap-3">
+                    <div className="text-sm font-semibold text-zinc-950 dark:text-white">
+                      {section.group}
+                    </div>
+                    <Text>{section.items.length} lines visible</Text>
                   </div>
-                  <Text>{section.items.length} lines visible</Text>
+                  {section.groupValue ? (
+                    <Button plain onClick={() => onAddCustomItem(section.groupValue)}>
+                      <PlusIcon data-slot="icon" />
+                      Add line
+                    </Button>
+                  ) : null}
                 </div>
-                <div>
+                <div
+                  className={
+                    dropTargetGroup === section.groupValue
+                      ? "bg-sky-500/[0.045] dark:bg-sky-400/[0.08]"
+                      : ""
+                  }
+                  onDragOver={(event) =>
+                    section.groupValue
+                      ? handleSectionDragOver(event, section.groupValue)
+                      : undefined
+                  }
+                  onDrop={(event) =>
+                    section.groupValue
+                      ? handleSectionDrop(event, section.groupValue)
+                      : undefined
+                  }
+                >
                   {section.items.map((item) => (
                     <BudgetLineRow
                       key={item.id}
                       item={item}
+                      isDragging={draggedItemId === item.id}
+                      onDragStart={() => {
+                        setDraggedItemId(item.id);
+                        setDropTargetGroup(null);
+                      }}
+                      onDragEnd={() => {
+                        setDraggedItemId(null);
+                        setDropTargetGroup(null);
+                      }}
                       onChange={
                         customItems.some(
                           (customItem) => customItem.id === item.id,
@@ -221,11 +275,7 @@ export function BudgetSetupStep({
                                 }
                               }
                       }
-                      onRemove={
-                        item.isCustom
-                          ? () => onRemoveCustomItem(item.id)
-                          : undefined
-                      }
+                      onDelete={() => onDeleteItem(item.id)}
                     />
                   ))}
                 </div>
@@ -238,61 +288,100 @@ export function BudgetSetupStep({
   );
 }
 
-function PackDescription({
+function PackOption({
   pack,
   isSelected,
+  onToggle,
 }: {
   pack: OnboardingPack;
   isSelected: boolean;
+  onToggle: () => void;
 }) {
   return (
-    <div
+    <button
+      type="button"
+      onClick={onToggle}
+      aria-pressed={isSelected}
       className={[
-        "rounded-2xl border px-5 py-4 transition",
+        "group rounded-[1.75rem] border px-5 py-4 text-left transition sm:px-6 sm:py-5",
         isSelected
-          ? "border-zinc-950/15 bg-zinc-950/[0.035] dark:border-white/15 dark:bg-white/[0.06]"
-          : "border-zinc-950/8 bg-white/55 dark:border-white/10 dark:bg-white/[0.025]",
+          ? "border-zinc-950/20 bg-zinc-950/[0.04] shadow-[0_12px_30px_-22px_rgba(24,24,27,0.55)] dark:border-white/15 dark:bg-white/[0.06]"
+          : "border-zinc-950/8 bg-white/55 shadow-[0_10px_25px_-24px_rgba(24,24,27,0.12)] hover:border-zinc-950/30 hover:bg-zinc-950/[0.045] hover:shadow-[0_20px_45px_-24px_rgba(24,24,27,0.28)] dark:border-white/10 dark:bg-white/[0.025] dark:hover:border-white/25 dark:hover:bg-white/[0.09] dark:hover:shadow-[0_20px_45px_-24px_rgba(0,0,0,0.45)]",
       ].join(" ")}
     >
-      <div className="flex items-center justify-between gap-4">
-        <div className="space-y-1">
-          <div className="font-medium text-zinc-950 dark:text-white">
-            {pack.name}
+      <div className="flex items-start justify-between gap-4">
+        <div className="space-y-3">
+          <div className="flex flex-wrap items-center gap-2.5">
+            <div className="font-medium text-zinc-950 transition group-hover:text-zinc-950 dark:text-white dark:group-hover:text-white">
+              {pack.name}
+            </div>
+            <Badge color={pack.accent} className="transition group-hover:scale-[1.03]">
+              {pack.items.length} lines
+            </Badge>
           </div>
-          <Text>{pack.description}</Text>
+          <Text className="max-w-[42ch] text-base/8 transition group-hover:text-zinc-700 sm:text-sm/6 dark:group-hover:text-zinc-200">
+            {pack.description}
+          </Text>
         </div>
-        {isSelected ? <Badge color="emerald">Selected</Badge> : null}
+
+        <div className="flex shrink-0 items-center gap-2 pt-0.5">
+          {isSelected ? (
+            <Badge color="emerald" className="gap-1.5">
+              <CheckIcon className="size-4" />
+              Included
+            </Badge>
+          ) : (
+            <span className="text-xs font-semibold uppercase tracking-[0.16em] text-zinc-400 transition group-hover:text-zinc-700 dark:text-zinc-500 dark:group-hover:text-zinc-200">
+              Add
+            </span>
+          )}
+        </div>
       </div>
-    </div>
+    </button>
   );
 }
 
 function BudgetLineRow({
   item,
+  isDragging,
+  onDragStart,
+  onDragEnd,
   onChange,
-  onRemove,
+  onDelete,
 }: {
   item: OnboardingBudgetItemDraft;
+  isDragging: boolean;
+  onDragStart: () => void;
+  onDragEnd: () => void;
   onChange: (
     itemId: string,
     field: "name" | "group" | "targetAmount" | "enabled",
     value: string | boolean,
   ) => void;
-  onRemove?: () => void;
+  onDelete: () => void;
 }) {
   return (
     <div
       className={[
-        "grid gap-4 px-5 py-4 transition lg:grid-cols-[2.75rem_minmax(0,2fr)_minmax(0,1.2fr)_9rem_5rem]",
-        item.enabled ? "" : "opacity-60",
+        "grid gap-4 px-5 py-4 transition lg:grid-cols-[2rem_minmax(0,1.9fr)_10rem_5.5rem]",
+        isDragging ? "opacity-50" : "",
       ].join(" ")}
     >
-      <div className="pt-2">
-        <Checkbox
-          checked={item.enabled}
-          onChange={(checked) => onChange(item.id, "enabled", checked)}
-          aria-label={`Toggle ${item.name || "budget line"}`}
-        />
+      <div className="flex items-start pt-2">
+        <button
+          type="button"
+          draggable
+          onDragStart={(event) => {
+            event.dataTransfer.effectAllowed = "move";
+            event.dataTransfer.setData("text/plain", item.id);
+            onDragStart();
+          }}
+          onDragEnd={onDragEnd}
+          className="cursor-grab rounded-md p-1 text-zinc-400 transition hover:bg-zinc-950/5 hover:text-zinc-600 active:cursor-grabbing dark:text-zinc-500 dark:hover:bg-white/5 dark:hover:text-zinc-300"
+          aria-label={`Drag ${item.name || "budget line"} to another group`}
+        >
+          <Bars3Icon className="size-5" />
+        </button>
       </div>
 
       <div className="space-y-2">
@@ -303,16 +392,6 @@ function BudgetLineRow({
           aria-label="Budget category name"
         />
         <Text>{item.description}</Text>
-      </div>
-
-      <div className="space-y-2">
-        <Input
-          value={item.group}
-          onChange={(event) => onChange(item.id, "group", event.target.value)}
-          placeholder="Group"
-          aria-label="Budget group"
-        />
-        <Text>Groups become the section headers in the budget workspace.</Text>
       </div>
 
       <div className="space-y-2">
@@ -331,18 +410,14 @@ function BudgetLineRow({
       </div>
 
       <div className="flex items-start justify-end pt-1">
-        {onRemove ? (
-          <Button
-            plain
-            className="text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300"
-            onClick={onRemove}
-          >
-            <TrashIcon data-slot="icon" />
-            Remove
-          </Button>
-        ) : (
-          <div className="hidden lg:block" />
-        )}
+        <Button
+          plain
+          className="text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300"
+          onClick={onDelete}
+        >
+          <TrashIcon data-slot="icon" />
+          Delete
+        </Button>
       </div>
     </div>
   );
@@ -352,7 +427,7 @@ function groupBudgetItems(items: OnboardingBudgetItemDraft[]) {
   const groups = new Map<string, OnboardingBudgetItemDraft[]>();
 
   for (const item of items) {
-    const group = item.group.trim() || "Unassigned";
+    const group = item.group.trim();
     const existingGroup = groups.get(group);
 
     if (existingGroup) {
@@ -373,10 +448,11 @@ function groupBudgetItems(items: OnboardingBudgetItemDraft[]) {
         return 1;
       }
 
-      return left.localeCompare(right);
+      return (left || "Unassigned").localeCompare(right || "Unassigned");
     })
     .map(([group, groupedItems]) => ({
-      group,
+      group: group || "Unassigned",
+      groupValue: group,
       items: groupedItems,
     }));
 }

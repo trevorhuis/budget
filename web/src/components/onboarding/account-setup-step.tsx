@@ -6,22 +6,16 @@ import {
   accountTypes,
   onboardingAccountStarters,
   type OnboardingAccountDraft,
-} from "../../lib/onboarding";
-import { Badge } from "../ui/badge";
-import { Button } from "../ui/button";
-import {
-  DescriptionDetails,
-  DescriptionList,
-  DescriptionTerm,
-} from "../ui/description-list";
-import { Input } from "../ui/input";
-import { Select } from "../ui/select";
-import { Subheading } from "../ui/heading";
-import { Text } from "../ui/text";
+} from "~/lib/onboarding";
+import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
+import { Select } from "~/components/ui/select";
+import { Subheading } from "~/components/ui/heading";
+import { Text } from "~/components/ui/text";
 
 type AccountSetupStepProps = {
   accounts: OnboardingAccountDraft[];
-  totalBalance: string;
   error: string | null;
   onAddStarter: (starterId: string) => void;
   onAddBlankAccount: () => void;
@@ -35,7 +29,6 @@ type AccountSetupStepProps = {
 
 export function AccountSetupStep({
   accounts,
-  totalBalance,
   error,
   onAddStarter,
   onAddBlankAccount,
@@ -44,34 +37,6 @@ export function AccountSetupStep({
 }: AccountSetupStepProps) {
   return (
     <div className="space-y-10">
-      <section className="space-y-5 border-b border-zinc-950/8 pb-8 dark:border-white/10">
-        <div className="space-y-2">
-          <div className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">
-            Step 2
-          </div>
-          <Subheading className="text-xl/8 sm:text-lg/8">
-            Add the accounts this app will track
-          </Subheading>
-          <Text className="max-w-3xl">
-            Start with the cash and debt surfaces you actually watch. Balances
-            can be rough opening numbers and refined later.
-          </Text>
-        </div>
-
-        <DescriptionList className="grid gap-x-8 gap-y-3 sm:grid-cols-3">
-          <DescriptionTerm>Tracked accounts</DescriptionTerm>
-          <DescriptionDetails>{accounts.length}</DescriptionDetails>
-
-          <DescriptionTerm>Opening net balance</DescriptionTerm>
-          <DescriptionDetails>{totalBalance}</DescriptionDetails>
-
-          <DescriptionTerm>Coverage</DescriptionTerm>
-          <DescriptionDetails>
-            Checking, savings, and credit cards are supported.
-          </DescriptionDetails>
-        </DescriptionList>
-      </section>
-
       <section className="space-y-5 border-b border-zinc-950/8 pb-8 dark:border-white/10">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div className="space-y-2">
@@ -140,7 +105,7 @@ export function AccountSetupStep({
                     placeholder="Account name"
                     aria-label="Account name"
                   />
-                  <Text>This is the label shown across the workspace.</Text>
+                  <Text>This is the label shown throughout the app.</Text>
                 </div>
 
                 <div className="space-y-2">
