@@ -1,23 +1,20 @@
+/* eslint-disable react-refresh/only-export-components */
+
 import { useState } from "react";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
-import { AuthLayout } from "../components/ui/auth-layout";
-import { Button } from "../components/ui/button";
-import {
-  Field,
-  FieldGroup,
-  Fieldset,
-  Label,
-} from "../components/ui/fieldset";
-import { Input } from "../components/ui/input";
-import { Text, TextLink } from "../components/ui/text";
+import { AuthLayout } from "~/components/ui/auth-layout";
+import { FieldGroup, Fieldset } from "~/components/ui/fieldset";
+import { Text, TextLink } from "~/components/ui/text";
+import { useAppForm } from "~/hooks/form";
 import {
   getAbsoluteCallbackURL,
   resolveAuthSession,
   sanitizeRedirect,
   useAuth,
-} from "../lib/auth";
-import { authClient } from "../lib/auth-client";
+} from "~/lib/auth";
+import { authClient } from "~/lib/auth-client";
+import * as z from "zod/mini";
 
 export const Route = createFileRoute("/register")({
   validateSearch: (search) => ({
@@ -38,35 +35,52 @@ export const Route = createFileRoute("/register")({
 function RegisterPage() {
   const auth = useAuth();
   const search = Route.useSearch();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const loginHref = `/login?redirect=${encodeURIComponent(search.redirect)}`;
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const form = useAppForm({
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    },
+    listeners: {
+      onChange: () => {
+        setErrorMessage(null);
+      },
+    },
+    validators: {
+      onChange: z.object({
+        name: z.string().check(z.trim(), z.minLength(1, "Name is required.")),
+        email: z.email("Enter a valid email address."),
+        password: z
+          .string()
+          .check(z.minLength(1, "Password is required.")),
+        confirmPassword: z
+          .string()
+          .check(z.minLength(1, "Confirm your password.")),
+      }),
+      onSubmit: ({ value }) => {
+        if (value.password === value.confirmPassword) {
+          return;
+        }
 
-    if (isSubmitting) {
-      return;
-    }
+        return {
+          fields: {
+            confirmPassword: "Passwords do not match.",
+          },
+        };
+      },
+    },
+    onSubmit: async ({ value }) => {
+      setErrorMessage(null);
 
-    if (password !== confirmPassword) {
-      setErrorMessage("Passwords do not match.");
-      return;
-    }
-
-    setErrorMessage(null);
-    setIsSubmitting(true);
-
-    try {
       const result = await authClient.signUp.email({
-        name: name.trim(),
-        email: email.trim(),
-        password,
+        name: value.name.trim(),
+        email: value.email.trim(),
+        password: value.password,
         callbackURL: getAbsoluteCallbackURL(search.redirect),
       });
 
@@ -77,10 +91,8 @@ function RegisterPage() {
 
       await auth.refetch();
       window.location.assign(search.redirect);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+    },
+  });
 
   return (
     <AuthLayout
@@ -94,56 +106,50 @@ function RegisterPage() {
         </Text>
       }
     >
-      <form className="space-y-8" onSubmit={handleSubmit}>
+      <form
+        className="space-y-8"
+        onSubmit={(event) => {
+          event.preventDefault();
+          form.handleSubmit();
+        }}
+      >
         <Fieldset>
           <FieldGroup>
-            <Field>
-              <Label>Name</Label>
-              <Input
-                autoComplete="name"
-                name="name"
-                type="text"
-                value={name}
-                onChange={(event) => setName(event.target.value)}
-                required
-              />
-            </Field>
+            <form.AppField name="name">
+              {(field) => (
+                <field.TextField autoComplete="name" label="Name" type="text" />
+              )}
+            </form.AppField>
 
-            <Field>
-              <Label>Email</Label>
-              <Input
-                autoComplete="email"
-                name="email"
-                type="email"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                required
-              />
-            </Field>
+            <form.AppField name="email">
+              {(field) => (
+                <field.TextField
+                  autoComplete="email"
+                  label="Email"
+                  type="email"
+                />
+              )}
+            </form.AppField>
 
-            <Field>
-              <Label>Password</Label>
-              <Input
-                autoComplete="new-password"
-                name="password"
-                type="password"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                required
-              />
-            </Field>
+            <form.AppField name="password">
+              {(field) => (
+                <field.TextField
+                  autoComplete="new-password"
+                  label="Password"
+                  type="password"
+                />
+              )}
+            </form.AppField>
 
-            <Field>
-              <Label>Confirm password</Label>
-              <Input
-                autoComplete="new-password"
-                name="confirmPassword"
-                type="password"
-                value={confirmPassword}
-                onChange={(event) => setConfirmPassword(event.target.value)}
-                required
-              />
-            </Field>
+            <form.AppField name="confirmPassword">
+              {(field) => (
+                <field.TextField
+                  autoComplete="new-password"
+                  label="Confirm password"
+                  type="password"
+                />
+              )}
+            </form.AppField>
           </FieldGroup>
         </Fieldset>
 
@@ -153,14 +159,9 @@ function RegisterPage() {
           </p>
         ) : null}
 
-        <Button
-          type="submit"
-          color="emerald"
-          className="w-full justify-center"
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? "Creating account..." : "Create account"}
-        </Button>
+        <form.AppForm>
+          <form.SubscribeButton label="Create account" />
+        </form.AppForm>
       </form>
     </AuthLayout>
   );

@@ -1,15 +1,17 @@
 import { createCollection } from "@tanstack/react-db";
 import { queryCollectionOptions } from "@tanstack/query-db-collection";
-import { type BudgetItem, BudgetItemSchema } from "../schemas";
+import { type BudgetItem, BudgetItemSchema } from "~/lib/schemas";
 import { uuidv7 } from "uuidv7";
 
-import { API } from "../api";
-import { queryClient } from "../integrations/queryClient";
+import { budgetItemsApi } from "~/lib/api/budgetItems";
+import { queryClient } from "~/lib/integrations/queryClient";
 
 type CreateBudgetItemInput = Pick<
   BudgetItem,
   "budgetId" | "categoryId" | "targetAmount"
 >;
+
+type UpdateBudgetItemTargetInput = Pick<BudgetItem, "id" | "targetAmount">;
 
 const normalizeBudgetItem = (budgetItem: BudgetItem) => ({
   ...budgetItem,
@@ -29,13 +31,13 @@ export const budgetItemCollection = createCollection(
     queryKey: ["budgetItems"],
     getKey: (budgetItem) => budgetItem.id,
     queryFn: async () => {
-      const { data } = await API.budgetItems.fetch();
+      const { data } = await budgetItemsApi.fetch();
       return data.map(normalizeBudgetItem);
     },
     onUpdate: async ({ transaction }) => {
       const { modified, original } = transaction.mutations[0];
 
-      await API.budgetItems.update(
+      await budgetItemsApi.update(
         original.id,
         normalizeBudgetItemUpdate(modified),
       );
@@ -43,7 +45,7 @@ export const budgetItemCollection = createCollection(
     onDelete: async ({ transaction }) => {
       const item = transaction.mutations[0].modified;
 
-      await API.budgetItems.delete(item.id);
+      await budgetItemsApi.delete(item.id);
     },
   }),
 );
@@ -53,7 +55,7 @@ export const createBudgetItem = async ({
   categoryId,
   targetAmount,
 }: CreateBudgetItemInput) => {
-  await API.budgetItems.create({
+  await budgetItemsApi.create({
     id: uuidv7(),
     actualAmount: 0,
     targetAmount,
@@ -62,4 +64,15 @@ export const createBudgetItem = async ({
   });
 
   await budgetItemCollection.utils.refetch();
+};
+
+export const updateBudgetItemTarget = async ({
+  id,
+  targetAmount,
+}: UpdateBudgetItemTargetInput) => {
+  await Promise.resolve(
+    budgetItemCollection.update(id, (draft) => {
+      draft.targetAmount = targetAmount;
+    }),
+  );
 };

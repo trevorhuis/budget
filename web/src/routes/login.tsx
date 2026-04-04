@@ -1,23 +1,20 @@
+/* eslint-disable react-refresh/only-export-components */
+
 import { useState } from "react";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
-import { AuthLayout } from "../components/ui/auth-layout";
-import { Button } from "../components/ui/button";
-import {
-  Field,
-  FieldGroup,
-  Fieldset,
-  Label,
-} from "../components/ui/fieldset";
-import { Input } from "../components/ui/input";
-import { Text, TextLink } from "../components/ui/text";
+import { AuthLayout } from "~/components/ui/auth-layout";
+import { FieldGroup, Fieldset } from "~/components/ui/fieldset";
+import { Text, TextLink } from "~/components/ui/text";
 import {
   getAbsoluteCallbackURL,
   resolveAuthSession,
   sanitizeRedirect,
   useAuth,
-} from "../lib/auth";
-import { authClient } from "../lib/auth-client";
+} from "~/lib/auth";
+import { authClient } from "~/lib/auth-client";
+import { useAppForm } from "~/hooks/form";
+import * as z from "zod/mini";
 
 export const Route = createFileRoute("/login")({
   validateSearch: (search) => ({
@@ -38,29 +35,29 @@ export const Route = createFileRoute("/login")({
 function LoginPage() {
   const auth = useAuth();
   const search = Route.useSearch();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const registerHref = `/register?redirect=${encodeURIComponent(
     search.redirect,
   )}`;
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const form = useAppForm({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+    validators: {
+      onChange: z.object({
+        email: z.string(),
+        password: z.string(),
+      }),
+    },
+    onSubmit: async ({ value }) => {
+      setErrorMessage(null);
 
-    if (isSubmitting) {
-      return;
-    }
-
-    setErrorMessage(null);
-    setIsSubmitting(true);
-
-    try {
       const result = await authClient.signIn.email({
-        email: email.trim(),
-        password,
+        email: value.email.trim(),
+        password: value.password,
         callbackURL: getAbsoluteCallbackURL(search.redirect),
       });
 
@@ -71,10 +68,8 @@ function LoginPage() {
 
       await auth.refetch();
       window.location.assign(search.redirect);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+    },
+  });
 
   return (
     <AuthLayout
@@ -87,32 +82,24 @@ function LoginPage() {
         </Text>
       }
     >
-      <form className="space-y-8" onSubmit={handleSubmit}>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          form.handleSubmit();
+        }}
+        className="space-y-8"
+      >
         <Fieldset>
           <FieldGroup>
-            <Field>
-              <Label>Email</Label>
-              <Input
-                autoComplete="email"
-                name="email"
-                type="email"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                required
-              />
-            </Field>
+            <form.AppField 
+              name="email"
+              children={(field) => <field.TextField label="Email" />}
+            />
 
-            <Field>
-              <Label>Password</Label>
-              <Input
-                autoComplete="current-password"
-                name="password"
-                type="password"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                required
-              />
-            </Field>
+            <form.AppField 
+              name="password"
+              children={(field) => <field.TextField label="Password" />}
+            />
           </FieldGroup>
         </Fieldset>
 
@@ -122,14 +109,9 @@ function LoginPage() {
           </p>
         ) : null}
 
-        <Button
-          type="submit"
-          color="emerald"
-          className="w-full justify-center"
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? "Signing in..." : "Sign in"}
-        </Button>
+        <form.AppForm>
+          <form.SubscribeButton label='Sign in' />
+        </form.AppForm>
       </form>
     </AuthLayout>
   );

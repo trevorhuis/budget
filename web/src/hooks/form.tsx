@@ -1,15 +1,32 @@
+/* eslint-disable react-refresh/only-export-components */
+
 import { createFormHook } from "@tanstack/react-form";
-import { lazy } from "react";
-import { fieldContext, formContext, useFormContext } from "./form-context.ts";
-import { Button } from "../components/ui/button.tsx";
+import type React from "react";
 
-const TextField = lazy(() => import("../components/form/text-fields.tsx"));
+import { fieldContext, formContext, useFormContext } from "~/hooks/form-context.ts";
+import { TextField } from "~/components/form/text-fields.tsx";
+import { Button } from "~/components/ui/button.tsx";
 
-function SubscribeButton({ label }: { label: string }) {
+type SubscribeButtonProps = {
+  children?: React.ReactNode;
+  color?: React.ComponentProps<typeof Button>["color"];
+  label?: string;
+};
+
+function SubscribeButton({
+  children,
+  color,
+  label = "Submit",
+}: SubscribeButtonProps) {
   const form = useFormContext();
+
   return (
     <form.Subscribe selector={(state) => state.isSubmitting}>
-      {(isSubmitting) => <Button disabled={isSubmitting}>{label}</Button>}
+      {(isSubmitting) => (
+        <Button color={color} disabled={isSubmitting} type="submit">
+          {children ?? label}
+        </Button>
+      )}
     </form.Subscribe>
   );
 }

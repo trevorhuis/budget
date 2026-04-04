@@ -12,8 +12,8 @@ import {
 import { Outlet, useRouterState } from "@tanstack/react-router";
 import { useState } from "react";
 
-import { useAuth } from "../lib/auth";
-import { Avatar } from "./ui/avatar";
+import { useAuth } from "~/lib/auth";
+import { Avatar } from "~/components/ui/avatar";
 import {
   Dropdown,
   DropdownButton,
@@ -24,14 +24,14 @@ import {
   DropdownLabel,
   DropdownMenu,
   DropdownSection,
-} from "./ui/dropdown";
+} from "~/components/ui/dropdown";
 import {
   Navbar,
   NavbarItem,
   NavbarLabel,
   NavbarSection,
   NavbarSpacer,
-} from "./ui/navbar";
+} from "~/components/ui/navbar";
 import {
   Sidebar,
   SidebarBody,
@@ -42,9 +42,9 @@ import {
   SidebarLabel,
   SidebarSection,
   SidebarSpacer,
-} from "./ui/sidebar";
-import { StackedLayout } from "./ui/stacked-layout";
-import { Text } from "./ui/text";
+} from "~/components/ui/sidebar";
+import { StackedLayout } from "~/components/ui/stacked-layout";
+import { Text } from "~/components/ui/text";
 
 const navItems = [
   {

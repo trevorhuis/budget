@@ -1,5 +1,5 @@
 import { Outlet, createFileRoute, useRouterState } from "@tanstack/react-router";
-import { TransactionsWorkspace } from "../../components/transactions-workspace";
+import { TransactionsPage } from "~/components/transactions/TransactionsPage";
 
 export const Route = createFileRoute("/_app/transactions")({
   component: function TransactionsRouteComponent() {
@@ -8,7 +8,7 @@ export const Route = createFileRoute("/_app/transactions")({
     });
 
     if (pathname === "/transactions") {
-      return <TransactionsWorkspace />;
+      return <TransactionsPage />;
     }
 
     return <Outlet />;

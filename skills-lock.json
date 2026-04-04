@@ -20,6 +20,11 @@
       "source": "better-auth/skills",
       "sourceType": "github",
       "computedHash": "747d7f73bd9e2ec5317b8ef88dc70f97df716d00e3d02de4051feebaa48b062d"
+    },
+    "postgres-best-practices": {
+      "source": "neondatabase/postgres-skills",
+      "sourceType": "github",
+      "computedHash": "76ad432ee02cdc525f24fe8a483b17de8a730c56118380852b60ce0159948a88"
     }
   }
 }

@@ -1,12 +1,13 @@
 import { createCollection } from "@tanstack/react-db";
 import { queryCollectionOptions } from "@tanstack/query-db-collection";
-import { type Account, AccountSchema } from "../schemas";
+import { type Account, AccountSchema } from "~/lib/schemas";
 import { uuidv7 } from "uuidv7";
 
-import { API } from "../api";
-import { queryClient } from "../integrations/queryClient";
+import { accountsApi } from "~/lib/api/accounts";
+import { queryClient } from "~/lib/integrations/queryClient";
 
-type CreateAccountInput = Pick<Account, "name" | "type" | "balance">;
+export type CreateAccountInput = Pick<Account, "name" | "type" | "balance">;
+export type UpdateAccountInput = { id: Account["id"] } & CreateAccountInput;
 
 const normalizeAccount = (account: Account) => ({
   ...account,
@@ -27,27 +28,44 @@ export const accountCollection = createCollection(
     queryKey: ["accounts"],
     getKey: (account) => account.id,
     queryFn: async () => {
-      const { data } = await API.accounts.fetch();
+      const { data } = await accountsApi.fetch();
       return data.map(normalizeAccount);
     },
     onUpdate: async ({ transaction }) => {
       const { modified, original } = transaction.mutations[0];
 
-      await API.accounts.update(original.id, normalizeAccountUpdate(modified));
+      await accountsApi.update(original.id, normalizeAccountUpdate(modified));
     },
     onDelete: async ({ transaction }) => {
       const item = transaction.mutations[0].modified;
 
-      await API.accounts.delete(item.id);
+      await accountsApi.delete(item.id);
     },
   }),
 );
 
 export const createAccount = async (account: CreateAccountInput) => {
-  await API.accounts.create({
+  await accountsApi.create({
     ...account,
     id: uuidv7(),
   });
 
   await accountCollection.utils.refetch();
+};
+
+export const updateAccount = async ({
+  id,
+  ...account
+}: UpdateAccountInput) => {
+  await Promise.resolve(
+    accountCollection.update(id, (draft) => {
+      draft.name = account.name;
+      draft.type = account.type;
+      draft.balance = account.balance;
+    }),
+  );
+};
+
+export const deleteAccount = async (accountId: Account["id"]) => {
+  await Promise.resolve(accountCollection.delete(accountId));
 };

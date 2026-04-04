@@ -1,13 +1,12 @@
 import { createOptimisticAction } from "@tanstack/react-db";
 import { uuidv7 } from "uuidv7";
-import type { Account, BudgetItem, Transaction } from "../lib/schemas";
+import type { Account, BudgetItem, Transaction } from "~/lib/schemas";
 
-import { API } from "../lib/api";
-import {
-  accountCollection,
-  budgetItemCollection,
-  transactionCollection,
-} from "../lib/collections";
+import { budgetItemsApi } from "~/lib/api/budgetItems";
+import { transactionsApi } from "~/lib/api/transactions";
+import { accountCollection } from "~/lib/collections/accountCollection";
+import { budgetItemCollection } from "~/lib/collections/budgetItemCollection";
+import { transactionCollection } from "~/lib/collections/transactionCollection";
 
 type CreateTransactionInput = Pick<
   Transaction,
@@ -70,7 +69,7 @@ const persistBudgetItemUpdates = async (
 ) => {
   await Promise.all(
     mutations.map(({ modified }) =>
-      API.budgetItems.update(modified.id, {
+      budgetItemsApi.update(modified.id, {
         actualAmount: modified.actualAmount,
         targetAmount: modified.targetAmount,
       }),
@@ -114,7 +113,7 @@ export const createTransaction = createOptimisticAction<{
     }
 
     await Promise.all([
-      API.transactions.create(
+      transactionsApi.create(
         normalizeTransactionCreate(transactionMutation.modified),
       ),
       persistBudgetItemUpdates(budgetItemMutations),

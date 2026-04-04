@@ -1,10 +1,10 @@
 import { createCollection } from "@tanstack/react-db";
 import { queryCollectionOptions } from "@tanstack/query-db-collection";
-import { type Budget, BudgetSchema } from "../schemas";
+import { type Budget, BudgetSchema } from "~/lib/schemas";
 import { uuidv7 } from "uuidv7";
 
-import { API } from "../api";
-import { queryClient } from "../integrations/queryClient";
+import { budgetsApi } from "~/lib/api/budgets";
+import { queryClient } from "~/lib/integrations/queryClient";
 
 type CreateBudgetInput = Pick<Budget, "month" | "year">;
 
@@ -26,24 +26,24 @@ export const budgetCollection = createCollection(
     queryKey: ["budgets"],
     getKey: (budget) => budget.id,
     queryFn: async () => {
-      const { data } = await API.budgets.fetch();
+      const { data } = await budgetsApi.fetch();
       return data.map(normalizeBudget);
     },
     onUpdate: async ({ transaction }) => {
       const { modified, original } = transaction.mutations[0];
 
-      await API.budgets.update(original.id, normalizeBudgetUpdate(modified));
+      await budgetsApi.update(original.id, normalizeBudgetUpdate(modified));
     },
     onDelete: async ({ transaction }) => {
       const item = transaction.mutations[0].modified;
 
-      await API.budgets.delete(item.id);
+      await budgetsApi.delete(item.id);
     },
   }),
 );
 
 export const createBudget = async ({ month, year }: CreateBudgetInput) => {
-  await API.budgets.create({
+  await budgetsApi.create({
     id: uuidv7(),
     month,
     year,

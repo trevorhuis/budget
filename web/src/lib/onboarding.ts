@@ -1,14 +1,16 @@
-import type { Account, Category } from "./schemas";
+import type { Account, Category } from "~/lib/schemas";
 import { uuidv7 } from "uuidv7";
 
-import { API } from "./api";
-import {
-  accountCollection,
-  budgetCollection,
-  budgetItemCollection,
-  categoryCollection,
-  recurringTransactionCollection,
-} from "./collections";
+import { accountsApi } from "~/lib/api/accounts";
+import { budgetItemsApi } from "~/lib/api/budgetItems";
+import { budgetsApi } from "~/lib/api/budgets";
+import { categoriesApi } from "~/lib/api/categories";
+import { recurringTransactionsApi } from "~/lib/api/recurringTransactions";
+import { accountCollection } from "~/lib/collections/accountCollection";
+import { budgetCollection } from "~/lib/collections/budgetCollection";
+import { budgetItemCollection } from "~/lib/collections/budgetItemCollection";
+import { categoryCollection } from "~/lib/collections/categoryCollection";
+import { recurringTransactionCollection } from "~/lib/collections/transactionRecurringCollection";
 
 export type OnboardingBudgetItemTemplate = {
   id: string;
@@ -309,13 +311,22 @@ export const createBudgetItemDraft = (
   isCustom: false,
 });
 
-export const createCustomBudgetItemDraft = (): OnboardingBudgetItemDraft => ({
+export const createCustomBudgetItemDraft = (
+  overrides: Partial<
+    Pick<
+      OnboardingBudgetItemDraft,
+      "name" | "group" | "description" | "targetAmount" | "enabled"
+    >
+  > = {},
+): OnboardingBudgetItemDraft => ({
   id: uuidv7(),
-  name: "",
-  group: "Everyday",
-  description: "A custom line you can shape before the first month goes live.",
-  targetAmount: "0.00",
-  enabled: true,
+  name: overrides.name ?? "",
+  group: overrides.group ?? "Everyday",
+  description:
+    overrides.description ??
+    "A custom line you can shape before the first month goes live.",
+  targetAmount: overrides.targetAmount ?? "0.00",
+  enabled: overrides.enabled ?? true,
   isCustom: true,
 });
 
@@ -351,9 +362,9 @@ export const invalidateOnboardingStatus = () => {
 export const getNeedsOnboarding = async () => {
   if (!onboardingStatusPromise) {
     onboardingStatusPromise = Promise.all([
-      API.budgets.fetch(),
-      API.budgetItems.fetch(),
-      API.accounts.fetch(),
+      budgetsApi.fetch(),
+      budgetItemsApi.fetch(),
+      accountsApi.fetch(),
     ])
       .then(([budgetsResponse, budgetItemsResponse, accountsResponse]) => {
         return (
@@ -421,7 +432,7 @@ export const completeOnboarding = async ({
 
     if (existingCategory) {
       if (existingCategory.status !== "active") {
-        await API.categories.update(existingCategory.id, {
+        await categoriesApi.update(existingCategory.id, {
           name: existingCategory.name,
           group: existingCategory.group,
           status: "active",
@@ -434,7 +445,7 @@ export const completeOnboarding = async ({
 
     const id = uuidv7();
 
-    await API.categories.create({
+    await categoriesApi.create({
       id,
       name: item.name.trim(),
       group: item.group.trim(),
@@ -446,7 +457,7 @@ export const completeOnboarding = async ({
 
   const budgetId = uuidv7();
 
-  await API.budgets.create({
+  await budgetsApi.create({
     id: budgetId,
     month,
     year,
@@ -454,7 +465,7 @@ export const completeOnboarding = async ({
 
   await Promise.all([
     ...budgetItems.map((item) =>
-      API.budgetItems.create({
+      budgetItemsApi.create({
         id: uuidv7(),
         actualAmount: 0,
         targetAmount: item.targetAmount,
@@ -463,7 +474,7 @@ export const completeOnboarding = async ({
       }),
     ),
     ...accounts.map((account) =>
-      API.accounts.create({
+      accountsApi.create({
         id: uuidv7(),
         name: account.name.trim(),
         type: account.type,
@@ -471,7 +482,7 @@ export const completeOnboarding = async ({
       }),
     ),
     ...recurringTransactions.map((transaction) =>
-      API.recurringTransactions.create({
+      recurringTransactionsApi.create({
         id: uuidv7(),
         merchant: transaction.merchant.trim(),
         amount: transaction.amount,

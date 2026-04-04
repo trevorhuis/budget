@@ -1,10 +1,7 @@
 import { and, eq, useLiveQuery } from "@tanstack/react-db";
-import {
-  budgetCollection,
-  budgetItemCollection,
-  categoryCollection,
-  transactionCollection,
-} from "../lib/collections";
+import { budgetCollection } from "~/lib/collections/budgetCollection";
+import { budgetItemCollection } from "~/lib/collections/budgetItemCollection";
+import { categoryCollection } from "~/lib/collections/categoryCollection";
 
 export const useBudgetData = (month: number, year: number) => {
   const { data: budget } = useLiveQuery((q) =>
@@ -17,12 +14,7 @@ export const useBudgetData = (month: number, year: number) => {
   );
 
   const { data: categories = [] } = useLiveQuery((q) =>
-    q.from({ categories: categoryCollection }).select(({ categories }) => ({
-      id: categories.id,
-      name: categories.name,
-      group: categories.group,
-      status: categories.status,
-    })),
+    q.from({ categories: categoryCollection }),
   );
 
   const { data: budgetItems = [] } = useLiveQuery(
@@ -36,21 +28,5 @@ export const useBudgetData = (month: number, year: number) => {
     [budget],
   );
 
-  const budgetItemIds = new Set(budgetItems.map((budgetItem) => budgetItem.id));
-
-  const { data: allTransactions = [] } = useLiveQuery((q) =>
-    q.from({ transactions: transactionCollection }),
-  );
-
-  const transactions = budget
-    ? allTransactions.filter((transaction) =>
-        budgetItemIds.has(transaction.budgetItemId),
-      )
-    : [];
-
-  const groupSet = new Set<string>();
-  categories.forEach((category) => groupSet.add(category.group));
-  const groups = [...groupSet];
-
-  return { budget, budgetItems, categories, transactions, groups };
+  return { budget: budget ?? null, budgetItems, categories };
 };

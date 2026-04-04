@@ -4,8 +4,8 @@ import {
   type ReactNode,
 } from "react";
 
-import { authClient, type AuthSession, type AuthUser } from "./auth-client";
-import { queryClient } from "./integrations/queryClient";
+import { authClient, type AuthSession, type AuthUser } from "~/lib/auth-client";
+import { queryClient } from "~/lib/integrations/queryClient";
 
 export type AuthContextValue = {
   session: AuthSession | null;
