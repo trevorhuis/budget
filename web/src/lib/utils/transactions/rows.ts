@@ -78,12 +78,7 @@ export const getTransactionSummary = (rows: readonly TransactionTableRow[]) => {
 
   const netBudgetImpact = rows.reduce((sum, row) => sum + row.signedAmount, 0);
 
-  const activeBudgetLines = new Set(
-    rows.map((row) => `${row.categoryName}:${row.budgetLabel}`),
-  ).size;
-
   return {
-    activeBudgetLines,
     creditTotal,
     debitTotal,
     netBudgetImpact,

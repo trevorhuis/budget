@@ -1,8 +1,9 @@
 import { useStore } from "@tanstack/react-form";
 import type React from "react";
-import { useFieldContext } from "~/hooks/form-context.ts";
 import { ErrorMessage, Field, Label } from "~/components/ui/fieldset.tsx";
 import { Input } from "~/components/ui/input.tsx";
+import { useFieldContext } from "~/hooks/form-context.ts";
+import { fieldErrorToString } from "~/lib/utils/formErrors.ts";
 
 type TextFieldProps = {
   label: string;
@@ -24,9 +25,12 @@ export function TextField({ label, ...inputProps }: TextFieldProps) {
         onBlur={field.handleBlur}
         onChange={(e) => field.handleChange(e.target.value)}
       />
-      {errors.map((error: string, index) => (
-        <ErrorMessage key={`${String(error)}-${index}`}>{error}</ErrorMessage>
-      ))}
+      {errors.map((error: unknown, index) => {
+        const text = fieldErrorToString(error);
+        return (
+          <ErrorMessage key={`${text}-${index}`}>{text}</ErrorMessage>
+        );
+      })}
     </Field>
   );
 }

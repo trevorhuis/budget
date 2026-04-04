@@ -105,7 +105,7 @@ export function AccountSetupStep({
                     placeholder="Account name"
                     aria-label="Account name"
                   />
-                  <Text>This is the label shown across the workspace.</Text>
+                  <Text>This is the label shown throughout the app.</Text>
                 </div>
 
                 <div className="space-y-2">

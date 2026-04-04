@@ -10,12 +10,14 @@ import { Button } from "~/components/ui/button.tsx";
 type SubscribeButtonProps = {
   children?: React.ReactNode;
   color?: React.ComponentProps<typeof Button>["color"];
+  className?: string;
   label?: string;
 };
 
 function SubscribeButton({
   children,
   color,
+  className,
   label = "Submit",
 }: SubscribeButtonProps) {
   const form = useFormContext();
@@ -23,7 +25,12 @@ function SubscribeButton({
   return (
     <form.Subscribe selector={(state) => state.isSubmitting}>
       {(isSubmitting) => (
-        <Button color={color} disabled={isSubmitting} type="submit">
+        <Button
+          className={className}
+          color={color}
+          disabled={isSubmitting}
+          type="submit"
+        >
           {children ?? label}
         </Button>
       )}

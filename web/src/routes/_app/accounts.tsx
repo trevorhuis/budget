@@ -126,8 +126,8 @@ function AccountsPage() {
           <div className="space-y-3">
             <Heading>Accounts</Heading>
             <Text>
-              Add, adjust, and remove the accounts that anchor the rest of the
-              budget workspace.
+              Add, adjust, and remove the accounts that anchor the rest of your
+              budget.
             </Text>
           </div>
 

@@ -1,86 +1,71 @@
-import {
-  ArrowPathRoundedSquareIcon,
-  ReceiptPercentIcon,
-} from "@heroicons/react/20/solid";
+import clsx from "clsx";
+import type { ReactNode } from "react";
+
 import { formatTransactionCurrency } from "~/lib/utils/transactions/format";
-import { Badge } from "~/components/ui/badge";
-import {
-  DescriptionDetails,
-  DescriptionList,
-  DescriptionTerm,
-} from "~/components/ui/description-list";
-import { Text } from "~/components/ui/text";
 
 type TransactionsSummaryProps = {
-  activeBudgetLines: number;
   creditTotal: number;
   debitTotal: number;
   netBudgetImpact: number;
   totalTransactions: number;
 };
 
+function SummaryMetric({
+  label,
+  children,
+  className,
+}: {
+  label: string;
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className="min-w-0">
+      <div className="text-[0.62rem] font-semibold uppercase tracking-[0.16em] text-zinc-500 dark:text-zinc-400">
+        {label}
+      </div>
+      <div
+        className={clsx(
+          "mt-0.5 truncate text-sm font-semibold tabular-nums text-zinc-950 dark:text-white",
+          className,
+        )}
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
+
 export function TransactionsSummary({
-  activeBudgetLines,
   creditTotal,
   debitTotal,
   netBudgetImpact,
   totalTransactions,
 }: TransactionsSummaryProps) {
   return (
-    <div className="space-y-6">
-      <DescriptionList className="max-w-3xl [&>dd]:pb-2.5 [&>dd]:pt-0.5 [&>dt]:pt-2.5 sm:[&>dd]:py-2.5 sm:[&>dt]:py-2.5">
-        <DescriptionTerm>Total transactions</DescriptionTerm>
-        <DescriptionDetails>{totalTransactions}</DescriptionDetails>
-
-        <DescriptionTerm>Debit flow</DescriptionTerm>
-        <DescriptionDetails>
+    <div className="border-b border-zinc-950/6 py-2.5 dark:border-white/8">
+      <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 sm:grid-cols-4">
+        <SummaryMetric label="Transactions">
+          {totalTransactions}
+        </SummaryMetric>
+        <SummaryMetric label="Money out">
           {formatTransactionCurrency(debitTotal)}
-        </DescriptionDetails>
-
-        <DescriptionTerm>Credit flow</DescriptionTerm>
-        <DescriptionDetails className="font-medium text-emerald-600 dark:text-emerald-400">
-          {formatTransactionCurrency(creditTotal)}
-        </DescriptionDetails>
-
-        <DescriptionTerm>Net budget impact</DescriptionTerm>
-        <DescriptionDetails
+        </SummaryMetric>
+        <SummaryMetric label="Money in">
+          <span className="text-emerald-600 dark:text-emerald-400">
+            {formatTransactionCurrency(creditTotal)}
+          </span>
+        </SummaryMetric>
+        <SummaryMetric
+          label="Net change"
           className={
             netBudgetImpact >= 0
-              ? "font-medium text-zinc-950 dark:text-white"
-              : "font-medium text-emerald-600 dark:text-emerald-400"
+              ? undefined
+              : "text-emerald-600 dark:text-emerald-400"
           }
         >
           {formatTransactionCurrency(netBudgetImpact)}
-        </DescriptionDetails>
-      </DescriptionList>
-
-      <div className="grid gap-3 sm:grid-cols-2">
-        <div className="rounded-2xl border border-zinc-950/8 px-4 py-3.5 dark:border-white/10">
-          <div className="flex items-center gap-3">
-            <Badge color="sky">
-              <ArrowPathRoundedSquareIcon className="size-4" />
-              Live sync
-            </Badge>
-          </div>
-          <Text className="mt-2.5">
-            Debits raise the selected budget line&apos;s actual spend. Credits
-            reduce it immediately in the client before the API round-trip
-            finishes.
-          </Text>
-        </div>
-
-        <div className="rounded-2xl border border-zinc-950/8 px-4 py-3.5 dark:border-white/10">
-          <div className="flex items-center gap-3">
-            <Badge color="amber">
-              <ReceiptPercentIcon className="size-4" />
-              Budget lines touched
-            </Badge>
-          </div>
-          <div className="mt-2.5 font-medium text-zinc-950 dark:text-white">
-            {activeBudgetLines}
-          </div>
-          <Text>Distinct budget lines with posted transaction activity.</Text>
-        </div>
+        </SummaryMetric>
       </div>
     </div>
   );

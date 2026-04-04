@@ -4,6 +4,7 @@ import type { BudgetGroup } from "~/lib/utils/budgetUtils";
 import { BudgetGroupSection } from "~/components/budget/BudgetGroupSection";
 
 type BudgetGroupsListProps = {
+  budgetId: string;
   editingBudgetItemId: BudgetItem["id"] | null;
   editingTargetAmount: string;
   groups: BudgetGroup[];
@@ -16,6 +17,7 @@ type BudgetGroupsListProps = {
 };
 
 export function BudgetGroupsList({
+  budgetId,
   editingBudgetItemId,
   editingTargetAmount,
   groups,
@@ -41,6 +43,7 @@ export function BudgetGroupsList({
           className="space-y-4"
         >
           <BudgetGroupSection
+            budgetId={budgetId}
             editingBudgetItemId={editingBudgetItemId}
             editingTargetAmount={editingTargetAmount}
             group={group}

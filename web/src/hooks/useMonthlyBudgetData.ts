@@ -6,13 +6,13 @@ import {
   sortCategoriesByGroup,
   type BudgetGroup,
   type BudgetRow,
-  type MonthlyBudgetWorkspaceData,
+  type MonthlyBudgetPageData,
 } from "~/lib/utils/budgetUtils";
 
 export const useMonthlyBudgetData = (
   month: number,
   year: number,
-): MonthlyBudgetWorkspaceData => {
+): MonthlyBudgetPageData => {
   const { budget, budgetItems, categories } = useBudgetData(month, year);
 
   const selectedBudgetItems = budget

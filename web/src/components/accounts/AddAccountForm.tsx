@@ -147,7 +147,7 @@ function LegendBlock() {
         </span>
         <div>
           <Subheading>Add account</Subheading>
-          <Text>Create a new balance source without leaving the workspace.</Text>
+          <Text>Create a new balance source without leaving this page.</Text>
         </div>
       </div>
     </div>

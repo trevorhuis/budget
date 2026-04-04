@@ -9,5 +9,6 @@ export const budgetFormMessages = {
   groupRequired: "Group name is required.",
   invalidInitialTarget: "Initial target must be a valid number.",
   invalidTargetAmount: "Target amount must be a valid number.",
+  targetAmountRequired: "Enter a target amount.",
   updateBudgetItemFailure: "Unable to save this budget item.",
 } as const;

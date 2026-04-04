@@ -1,6 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
 
-import { PlusIcon } from "@heroicons/react/20/solid";
 import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "motion/react";
 import { useMemo, useState } from "react";
@@ -10,9 +9,9 @@ import { BudgetCreateState } from "~/components/budget/BudgetCreateState";
 import { BudgetEmptyState } from "~/components/budget/BudgetEmptyState";
 import { BudgetGroupsList } from "~/components/budget/BudgetGroupsList";
 import { BudgetHeader } from "~/components/budget/BudgetHeader";
+import { BudgetPlanningPanel } from "~/components/budget/BudgetPlanningPanel";
+import { BudgetQuickAddStrip } from "~/components/budget/BudgetQuickAddStrip";
 import { BudgetSummary } from "~/components/budget/BudgetSummary";
-import { Button } from "~/components/ui/button";
-import { Text } from "~/components/ui/text";
 import { useMonthlyBudgetData } from "~/hooks/useMonthlyBudgetData";
 import { createBudget } from "~/lib/collections/budgetCollection";
 import { updateBudgetItemTarget } from "~/lib/collections/budgetItemCollection";
@@ -51,7 +50,7 @@ function BudgetPage() {
     [selectedMonthValue],
   );
 
-  const workspace = useMonthlyBudgetData(month, year);
+  const budgetData = useMonthlyBudgetData(month, year);
   const monthLabel = formatMonthLabel(month, year);
 
   const {
@@ -64,7 +63,7 @@ function BudgetPage() {
     knownGroups,
     overspentCategories,
     plannedNet,
-  } = workspace;
+  } = budgetData;
 
   const createMonthBudget = async () => {
     setBudgetError(null);
@@ -133,12 +132,12 @@ function BudgetPage() {
   };
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-8">
       <motion.section
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, ease: "easeOut" }}
-        className="space-y-8 border-b border-zinc-950/6 pb-10 dark:border-white/8"
+        className="space-y-4 border-b border-zinc-950/6 pb-6 dark:border-white/8"
       >
         <BudgetHeader
           monthLabel={monthLabel}
@@ -155,31 +154,11 @@ function BudgetPage() {
           plannedNet={plannedNet}
         />
 
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <Button
-            color="dark/zinc"
-            onClick={() => setIsAddBudgetItemOpen(true)}
-            disabled={!budget || availableCategories.length === 0}
-          >
-            <PlusIcon data-slot="icon" />
-            Add budget item
-          </Button>
-          <Button
-            outline
-            onClick={() => setIsAddCategoryOpen(true)}
-            disabled={!budget}
-          >
-            <PlusIcon data-slot="icon" />
-            Add category
-          </Button>
-          {!budget ? (
-            <Text>Create the month budget first to start planning.</Text>
-          ) : availableCategories.length === 0 ? (
-            <Text>All active categories are already assigned to this month.</Text>
-          ) : (
-            <Text>{monthLabel} is the active planning month.</Text>
-          )}
-        </div>
+        <BudgetPlanningPanel
+          budgetId={budget?.id ?? null}
+          hasKnownGroups={knownGroups.length > 0}
+          monthLabel={monthLabel}
+        />
       </motion.section>
 
       {!budget ? (
@@ -189,20 +168,37 @@ function BudgetPage() {
           monthLabel={monthLabel}
           onCreate={() => void createMonthBudget()}
         />
-      ) : groups.length === 0 ? (
-        <BudgetEmptyState monthLabel={monthLabel} />
       ) : (
-        <BudgetGroupsList
-          editingBudgetItemId={editingState?.budgetItemId ?? null}
-          editingTargetAmount={editingState?.targetAmount ?? ""}
-          groups={groups}
-          isSaving={isSaving}
-          saveError={saveError}
-          onCancelEditing={stopEditing}
-          onEditingTargetAmountChange={updateEditingTargetAmount}
-          onSaveBudgetItem={(budgetItem) => void saveBudgetItem(budgetItem)}
-          onStartEditing={startEditing}
-        />
+        <>
+          {groups.length === 0 ? (
+            <BudgetEmptyState
+              monthLabel={monthLabel}
+              hasAvailableCategories={availableCategories.length > 0}
+              onAddCategory={() => setIsAddCategoryOpen(true)}
+              onAddBudgetItem={() => setIsAddBudgetItemOpen(true)}
+            />
+          ) : (
+            <>
+              <BudgetGroupsList
+                budgetId={budget.id}
+                editingBudgetItemId={editingState?.budgetItemId ?? null}
+                editingTargetAmount={editingState?.targetAmount ?? ""}
+                groups={groups}
+                isSaving={isSaving}
+                saveError={saveError}
+                onCancelEditing={stopEditing}
+                onEditingTargetAmountChange={updateEditingTargetAmount}
+                onSaveBudgetItem={(budgetItem) => void saveBudgetItem(budgetItem)}
+                onStartEditing={startEditing}
+              />
+              <BudgetQuickAddStrip
+                canAddBudgetItem={availableCategories.length > 0}
+                onAddBudgetItem={() => setIsAddBudgetItemOpen(true)}
+                onAddCategory={() => setIsAddCategoryOpen(true)}
+              />
+            </>
+          )}
+        </>
       )}
 
       <AddBudgetItemDialog

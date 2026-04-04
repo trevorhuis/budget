@@ -47,8 +47,10 @@ export function AddBudgetItemDialog({
       },
     },
     validators: {
-      onChange: ({ value }) => validateAddBudgetItemFormValues(value),
-      onSubmit: ({ value }) => validateAddBudgetItemFormValues(value),
+      onChange: ({ value }) =>
+        validateAddBudgetItemFormValues(value, "change"),
+      onSubmit: ({ value }) =>
+        validateAddBudgetItemFormValues(value, "submit"),
     },
     onSubmit: async ({ formApi, value }) => {
       if (!budgetId) {

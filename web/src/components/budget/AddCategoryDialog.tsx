@@ -58,9 +58,15 @@ export function AddCategoryDialog({
     },
     validators: {
       onChange: ({ value }) =>
-        validateAddCategoryFormValues(value, { hasKnownGroups }),
+        validateAddCategoryFormValues(value, {
+          hasKnownGroups,
+          mode: "change",
+        }),
       onSubmit: ({ value }) =>
-        validateAddCategoryFormValues(value, { hasKnownGroups }),
+        validateAddCategoryFormValues(value, {
+          hasKnownGroups,
+          mode: "submit",
+        }),
     },
     onSubmit: async ({ formApi, value }) => {
       if (!budgetId) {

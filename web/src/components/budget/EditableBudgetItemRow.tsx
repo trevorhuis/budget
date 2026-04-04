@@ -46,7 +46,7 @@ export function EditableBudgetItemRow({
           {row.category.name}
         </span>
       </TableCell>
-      <TableCell className="align-middle">
+      <TableCell className="align-middle text-right">
         {isEditing ? (
           <div className="space-y-2">
             <Input
@@ -56,9 +56,10 @@ export function EditableBudgetItemRow({
               onChange={(event) =>
                 onEditingTargetAmountChange(event.target.value)
               }
+              className="text-right tabular-nums"
             />
             {saveError ? (
-              <Text className="text-rose-600 dark:text-rose-400">
+              <Text className="text-left text-rose-600 dark:text-rose-400">
                 {saveError}
               </Text>
             ) : null}
@@ -69,7 +70,7 @@ export function EditableBudgetItemRow({
           </span>
         )}
       </TableCell>
-      <TableCell className="align-middle font-medium tabular-nums text-zinc-950 dark:text-white">
+      <TableCell className="align-middle text-right font-medium tabular-nums text-zinc-950 dark:text-white">
         {formatCurrency(row.budgetItem.actualAmount)}
       </TableCell>
       <TableCell className="align-middle font-medium">

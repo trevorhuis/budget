@@ -119,8 +119,8 @@ function ChatPage() {
             <Text>
               Ask direct questions about your budget, spending drift, and recent
               account activity. The assistant is connected to your budget data
-              and can reason over the current workspace instead of answering
-              generically.
+              and can use your budget, accounts, and recent activity instead of
+              answering generically.
             </Text>
           </div>
 

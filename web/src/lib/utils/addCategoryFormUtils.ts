@@ -33,28 +33,38 @@ export const resolveAddCategoryGroup = (values: AddCategoryFormValues) => {
 
 export const validateAddCategoryFormValues = (
   values: AddCategoryFormValues,
-  options: { hasKnownGroups: boolean },
+  options: { hasKnownGroups: boolean; mode?: "change" | "submit" },
 ) => {
+  const mode = options.mode ?? "submit";
   const fieldErrors: AddCategoryFormFieldErrors = {};
   const trimmedName = values.name.trim();
   const resolvedGroup = resolveAddCategoryGroup(values);
 
   if (!trimmedName) {
-    fieldErrors.name = budgetFormMessages.categoryNameRequired;
-  }
-
-  if (!resolvedGroup) {
-    if (
-      !options.hasKnownGroups ||
-      values.groupSelection === CREATE_GROUP_OPTION
-    ) {
-      fieldErrors.newGroup = budgetFormMessages.groupRequired;
-    } else {
-      fieldErrors.groupSelection = budgetFormMessages.groupRequired;
+    if (mode === "submit") {
+      fieldErrors.name = budgetFormMessages.categoryNameRequired;
     }
   }
 
-  if (parseAmountInput(values.targetAmount) === null) {
+  if (!resolvedGroup) {
+    if (mode === "submit") {
+      if (
+        !options.hasKnownGroups ||
+        values.groupSelection === CREATE_GROUP_OPTION
+      ) {
+        fieldErrors.newGroup = budgetFormMessages.groupRequired;
+      } else {
+        fieldErrors.groupSelection = budgetFormMessages.groupRequired;
+      }
+    }
+  }
+
+  const amountTrimmed = values.targetAmount.trim();
+  if (!amountTrimmed) {
+    if (mode === "submit") {
+      fieldErrors.targetAmount = budgetFormMessages.targetAmountRequired;
+    }
+  } else if (parseAmountInput(values.targetAmount) === null) {
     fieldErrors.targetAmount = budgetFormMessages.invalidInitialTarget;
   }
 

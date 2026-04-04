@@ -24,14 +24,22 @@ export const getDefaultAddBudgetItemFormValues =
 
 export const validateAddBudgetItemFormValues = (
   values: AddBudgetItemFormValues,
+  mode: "change" | "submit" = "submit",
 ) => {
   const fieldErrors: AddBudgetItemFormFieldErrors = {};
 
   if (!values.categoryId) {
-    fieldErrors.categoryId = budgetFormMessages.categorySelectionRequired;
+    if (mode === "submit") {
+      fieldErrors.categoryId = budgetFormMessages.categorySelectionRequired;
+    }
   }
 
-  if (parseAmountInput(values.targetAmount) === null) {
+  const amountTrimmed = values.targetAmount.trim();
+  if (!amountTrimmed) {
+    if (mode === "submit") {
+      fieldErrors.targetAmount = budgetFormMessages.targetAmountRequired;
+    }
+  } else if (parseAmountInput(values.targetAmount) === null) {
     fieldErrors.targetAmount = budgetFormMessages.invalidTargetAmount;
   }
 

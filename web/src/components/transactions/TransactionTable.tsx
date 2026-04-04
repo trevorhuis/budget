@@ -247,9 +247,9 @@ export function TransactionTable({ rows }: { rows: TransactionTableRow[] }) {
   const visibleRows = table.getRowModel().rows;
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col gap-2.5 border-b border-zinc-950/6 pb-4 sm:flex-row sm:items-center sm:justify-between dark:border-white/8">
-        <div className="grid gap-2 sm:grid-cols-[minmax(18rem,1fr)_11rem_12rem]">
+    <div className="min-w-0 max-w-full space-y-4">
+      <div className="flex w-full min-w-0 flex-col gap-2.5 border-b border-zinc-950/6 pb-4 sm:flex-row sm:items-center sm:justify-between dark:border-white/8">
+        <div className="grid min-w-0 w-full gap-2 sm:grid-cols-[minmax(0,1fr)_minmax(8rem,11rem)_minmax(8rem,12rem)]">
           <label className="relative block">
             <MagnifyingGlassIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-400" />
             <Input

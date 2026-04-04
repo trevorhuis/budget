@@ -23,8 +23,8 @@ export function DeleteAccountAlert({
       <AlertTitle>Delete account</AlertTitle>
       <AlertDescription>
         {deleteTarget
-          ? `Remove ${deleteTarget.name} from the workspace. This action cannot be undone.`
-          : "Remove this account from the workspace."}
+          ? `Remove ${deleteTarget.name} from your accounts. This action cannot be undone.`
+          : "Remove this account from your accounts."}
       </AlertDescription>
       {deleteError ? (
         <Text className="mt-4 text-red-600 dark:text-red-400">

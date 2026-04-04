@@ -34,6 +34,7 @@ export type ParsedTransactionFormValues = Pick<
 export const transactionFormMessages = {
   accountRequired: "Select an account for this transaction.",
   amountInvalid: "Amount must be a positive number.",
+  amountRequired: "Enter an amount.",
   budgetLineRequired: "Select the budget line this transaction belongs to.",
   createFailure: "Unable to create this transaction.",
   dateRequired: "Transaction date is required.",
@@ -61,30 +62,53 @@ export const resetTransactionFormValues = ({
   type,
 });
 
-export const validateTransactionFormValues = (values: TransactionFormValues) => {
+/**
+ * `change` — only flag fields that are clearly wrong (e.g. non-empty invalid amount).
+ * Skips empty required fields so errors don’t appear before the user submits.
+ * `submit` — full validation for posting.
+ */
+export const validateTransactionFormValues = (
+  values: TransactionFormValues,
+  mode: "change" | "submit" = "submit",
+) => {
   const fieldErrors: TransactionFormFieldErrors = {};
   const merchant = values.merchant.trim();
-  const amount = Number(values.amount.trim());
+  const amountStr = values.amount.trim();
   const date = parseTransactionDateInputValue(values.date);
 
   if (!merchant) {
-    fieldErrors.merchant = transactionFormMessages.merchantRequired;
+    if (mode === "submit") {
+      fieldErrors.merchant = transactionFormMessages.merchantRequired;
+    }
   }
 
-  if (!Number.isFinite(amount) || amount <= 0) {
-    fieldErrors.amount = transactionFormMessages.amountInvalid;
+  if (!amountStr) {
+    if (mode === "submit") {
+      fieldErrors.amount = transactionFormMessages.amountRequired;
+    }
+  } else {
+    const amount = Number(amountStr);
+    if (!Number.isFinite(amount) || amount <= 0) {
+      fieldErrors.amount = transactionFormMessages.amountInvalid;
+    }
   }
 
   if (!date) {
-    fieldErrors.date = transactionFormMessages.dateRequired;
+    if (mode === "submit") {
+      fieldErrors.date = transactionFormMessages.dateRequired;
+    }
   }
 
   if (!values.accountId) {
-    fieldErrors.accountId = transactionFormMessages.accountRequired;
+    if (mode === "submit") {
+      fieldErrors.accountId = transactionFormMessages.accountRequired;
+    }
   }
 
   if (!values.budgetItemId) {
-    fieldErrors.budgetItemId = transactionFormMessages.budgetLineRequired;
+    if (mode === "submit") {
+      fieldErrors.budgetItemId = transactionFormMessages.budgetLineRequired;
+    }
   }
 
   return Object.keys(fieldErrors).length > 0

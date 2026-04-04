@@ -1,5 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 
+import { ExclamationCircleIcon } from "@heroicons/react/20/solid";
 import { useState } from "react";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
@@ -15,6 +16,36 @@ import {
 } from "~/lib/auth";
 import { authClient } from "~/lib/auth-client";
 import * as z from "zod/mini";
+
+const registerOnChangeSchema = z.object({
+  name: z.string(),
+  email: z.union([
+    z.literal(""),
+    z.email("Enter a valid email address."),
+  ]),
+  password: z.string(),
+  confirmPassword: z.string(),
+});
+
+const registerOnSubmitSchema = z
+  .object({
+    name: z.string().check(z.trim(), z.minLength(1, "Name is required.")),
+    email: z.email("Enter a valid email address."),
+    password: z.string().check(z.minLength(1, "Password is required.")),
+    confirmPassword: z
+      .string()
+      .check(z.minLength(1, "Confirm your password.")),
+  })
+  .check((payload) => {
+    if (payload.value.password !== payload.value.confirmPassword) {
+      payload.issues.push({
+        code: "custom",
+        message: "Passwords do not match.",
+        path: ["confirmPassword"],
+        input: payload.value.confirmPassword,
+      });
+    }
+  });
 
 export const Route = createFileRoute("/register")({
   validateSearch: (search) => ({
@@ -52,27 +83,8 @@ function RegisterPage() {
       },
     },
     validators: {
-      onChange: z.object({
-        name: z.string().check(z.trim(), z.minLength(1, "Name is required.")),
-        email: z.email("Enter a valid email address."),
-        password: z
-          .string()
-          .check(z.minLength(1, "Password is required.")),
-        confirmPassword: z
-          .string()
-          .check(z.minLength(1, "Confirm your password.")),
-      }),
-      onSubmit: ({ value }) => {
-        if (value.password === value.confirmPassword) {
-          return;
-        }
-
-        return {
-          fields: {
-            confirmPassword: "Passwords do not match.",
-          },
-        };
-      },
+      onChange: registerOnChangeSchema,
+      onSubmit: registerOnSubmitSchema,
     },
     onSubmit: async ({ value }) => {
       setErrorMessage(null);
@@ -96,9 +108,9 @@ function RegisterPage() {
 
   return (
     <AuthLayout
-      eyebrow="Private by default"
-      title="Create your workspace"
-      description="Register once, then every budget, account, and import stays tied to your session-backed identity."
+      eyebrow="Get started"
+      title="Create account"
+      description="One quick setup—then your budgets, accounts, imports, and chat stay private to this login."
       footer={
         <Text>
           Already have an account?{" "}
@@ -107,7 +119,7 @@ function RegisterPage() {
       }
     >
       <form
-        className="space-y-8"
+        className="space-y-6"
         onSubmit={(event) => {
           event.preventDefault();
           form.handleSubmit();
@@ -117,7 +129,13 @@ function RegisterPage() {
           <FieldGroup>
             <form.AppField name="name">
               {(field) => (
-                <field.TextField autoComplete="name" label="Name" type="text" />
+                <field.TextField
+                  autoComplete="name"
+                  autoFocus
+                  label="Name"
+                  placeholder="Your name"
+                  type="text"
+                />
               )}
             </form.AppField>
 
@@ -126,6 +144,7 @@ function RegisterPage() {
                 <field.TextField
                   autoComplete="email"
                   label="Email"
+                  placeholder="you@example.com"
                   type="email"
                 />
               )}
@@ -136,6 +155,7 @@ function RegisterPage() {
                 <field.TextField
                   autoComplete="new-password"
                   label="Password"
+                  placeholder="••••••••"
                   type="password"
                 />
               )}
@@ -146,6 +166,7 @@ function RegisterPage() {
                 <field.TextField
                   autoComplete="new-password"
                   label="Confirm password"
+                  placeholder="••••••••"
                   type="password"
                 />
               )}
@@ -154,14 +175,25 @@ function RegisterPage() {
         </Fieldset>
 
         {errorMessage ? (
-          <p className="text-sm/6 text-red-600 dark:text-red-400">
-            {errorMessage}
-          </p>
+          <div
+            role="alert"
+            className="flex gap-3 rounded-xl border border-red-200/90 bg-red-50/95 p-3.5 text-sm text-red-900 shadow-sm dark:border-red-500/30 dark:bg-red-950/50 dark:text-red-100"
+          >
+            <ExclamationCircleIcon
+              className="size-5 shrink-0 text-red-600 dark:text-red-400"
+              aria-hidden
+            />
+            <p className="min-w-0 pt-0.5 leading-snug">{errorMessage}</p>
+          </div>
         ) : null}
 
-        <form.AppForm>
-          <form.SubscribeButton label="Create account" />
-        </form.AppForm>
+        <div className="border-t border-zinc-950/8 pt-6 dark:border-white/10">
+          <form.AppForm>
+            <div className="flex flex-col gap-3 [&_button]:w-full">
+              <form.SubscribeButton color="emerald" label="Create account" />
+            </div>
+          </form.AppForm>
+        </div>
       </form>
     </AuthLayout>
   );

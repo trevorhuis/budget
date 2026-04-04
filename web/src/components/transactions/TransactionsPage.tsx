@@ -1,12 +1,12 @@
 import { useTransactionsPageData } from "~/hooks/useTransactionsPageData";
-import { TransactionsWorkspace } from "~/components/transactions/TransactionsWorkspace";
+import { TransactionsView } from "~/components/transactions/TransactionsView";
 
 export function TransactionsPage() {
   const { accountOptions, budgetLineOptions, summary, transactionRows } =
     useTransactionsPageData();
 
   return (
-    <TransactionsWorkspace
+    <TransactionsView
       accountOptions={accountOptions}
       budgetLineOptions={budgetLineOptions}
       summary={summary}

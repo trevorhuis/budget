@@ -1,7 +1,6 @@
 import { Field, Label } from "~/components/ui/fieldset";
 import { Heading } from "~/components/ui/heading";
 import { Input } from "~/components/ui/input";
-import { Text } from "~/components/ui/text";
 
 type BudgetHeaderProps = {
   monthLabel: string;
@@ -15,36 +14,34 @@ export function BudgetHeader({
   onSelectedMonthValueChange,
 }: BudgetHeaderProps) {
   return (
-    <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-      <div className="space-y-4">
-        <div className="inline-flex items-center gap-3 rounded-full border border-zinc-950/10 bg-zinc-950/[0.03] px-3 py-1.5 text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-zinc-600 dark:border-white/10 dark:bg-white/[0.04] dark:text-zinc-300">
-          Budget workspace
-          <span className="rounded-full bg-zinc-950 px-2.5 py-1 text-[0.62rem] tracking-[0.18em] text-white dark:bg-white dark:text-zinc-950">
-            {monthLabel}
+    <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-6">
+      <div className="min-w-0 space-y-1">
+        <p className="text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-zinc-500 dark:text-zinc-400">
+          Planning
+          <span className="mx-2 font-normal text-zinc-400 dark:text-zinc-600">
+            ·
           </span>
-        </div>
-        <div className="space-y-3">
-          <Heading className="text-4xl/none tracking-tight text-zinc-950 sm:text-5xl/none dark:text-white">
-            Monthly budget
-          </Heading>
-          <div className="h-px w-24 bg-gradient-to-r from-zinc-950 via-zinc-950/40 to-transparent dark:from-white dark:via-white/40" />
-        </div>
-        <Text className="max-w-2xl">
-          Review one month at a time, watch category pressure early, and tune
-          plan targets without leaving the page.
-        </Text>
+          <span className="text-zinc-600 dark:text-zinc-300">{monthLabel}</span>
+        </p>
+        <Heading
+          level={1}
+          className="!text-xl/none !font-semibold tracking-tight sm:!text-2xl/none"
+        >
+          Monthly budget
+        </Heading>
       </div>
 
-      <div className="w-full max-w-xs">
+      <div className="w-full shrink-0 sm:w-[11.5rem]">
         <Field>
-          <Label>Month</Label>
+          <Label className="text-xs">Month</Label>
           <Input
             type="month"
             value={selectedMonthValue}
             onChange={(event) => onSelectedMonthValueChange(event.target.value)}
+            className="text-sm"
           />
         </Field>
       </div>
-    </div>
+    </header>
   );
 }

@@ -24,7 +24,7 @@ export type BudgetGroup = {
   targetAmount: number;
 };
 
-export type MonthlyBudgetWorkspaceData = {
+export type MonthlyBudgetPageData = {
   actualSpending: number;
   availableCategories: Category[];
   budget: Budget | null;

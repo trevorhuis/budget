@@ -850,7 +850,7 @@ function OnboardingPage() {
             disabled={isSubmitting || !areCategoriesReady}
           >
             <CheckIcon data-slot="icon" />
-            {isSubmitting ? "Creating workspace..." : "Create workspace"}
+            {isSubmitting ? "Finishing setup..." : "Finish setup"}
           </Button>
         )}
       </div>

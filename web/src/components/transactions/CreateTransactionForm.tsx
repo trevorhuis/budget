@@ -14,6 +14,7 @@ import {
   resetTransactionFormValues,
   validateTransactionFormValues,
 } from "~/lib/utils/transactions/form";
+import { fieldErrorToString } from "~/lib/utils/formErrors.ts";
 import {
   ErrorMessage,
   Field,
@@ -46,8 +47,10 @@ export function CreateTransactionForm({
       },
     },
     validators: {
-      onChange: ({ value }) => validateTransactionFormValues(value),
-      onSubmit: ({ value }) => validateTransactionFormValues(value),
+      onChange: ({ value }) =>
+        validateTransactionFormValues(value, "change"),
+      onSubmit: ({ value }) =>
+        validateTransactionFormValues(value, "submit"),
     },
     onSubmit: async ({ formApi, value }) => {
       const parsedValues = parseTransactionFormValues(value);
@@ -110,26 +113,52 @@ export function CreateTransactionForm({
         event.preventDefault();
         void form.handleSubmit();
       }}
-      className="rounded-2xl border border-zinc-950/8 bg-zinc-50/70 p-5 shadow-sm dark:border-white/10 dark:bg-white/4"
+      className="rounded-xl border border-zinc-950/8 bg-zinc-50/70 p-3 shadow-sm sm:p-4 dark:border-white/10 dark:bg-white/4"
     >
       <Fieldset>
-        <Legend>Create transaction</Legend>
-        <Text className="mt-1">
-          Every new transaction posts to one budget line and updates that
-          line&apos;s actual amount optimistically.
+        <Legend className="!text-sm/none !font-semibold">
+          Create transaction
+        </Legend>
+        <Text className="mt-0.5 text-xs/4 text-zinc-500 dark:text-zinc-400">
+          One budget line per post; actuals refresh optimistically.
         </Text>
 
-        <FieldGroup className="mt-6">
-          <form.AppField name="merchant">
-            {(field) => (
-              <field.TextField
-                label="Merchant"
-                placeholder="H-E-B, rent, payroll"
-              />
-            )}
-          </form.AppField>
+        <FieldGroup className="!mt-3 !space-y-3">
+          <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_6.5rem] sm:items-start">
+            <form.AppField name="merchant">
+              {(field) => (
+                <field.TextField
+                  label="Merchant"
+                  placeholder="H-E-B, rent, payroll"
+                />
+              )}
+            </form.AppField>
 
-          <div className="grid gap-3 sm:grid-cols-2">
+            <form.AppField name="amount">
+              {(field) => (
+                <Field>
+                  <Label>Amount</Label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    inputMode="decimal"
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(event) => field.handleChange(event.target.value)}
+                    placeholder="0.00"
+                    className="text-sm"
+                  />
+                  {field.state.meta.errors.map((error, index) => (
+                    <ErrorMessage key={`${fieldErrorToString(error)}-${index}`}>
+                      {fieldErrorToString(error)}
+                    </ErrorMessage>
+                  ))}
+                </Field>
+              )}
+            </form.AppField>
+          </div>
+
+          <div className="grid gap-2 sm:grid-cols-2">
             <form.AppField name="date">
               {(field) => (
                 <Field>
@@ -139,10 +168,11 @@ export function CreateTransactionForm({
                     value={field.state.value}
                     onBlur={field.handleBlur}
                     onChange={(event) => field.handleChange(event.target.value)}
+                    className="text-sm"
                   />
                   {field.state.meta.errors.map((error, index) => (
-                    <ErrorMessage key={`${String(error)}-${index}`}>
-                      {String(error)}
+                    <ErrorMessage key={`${fieldErrorToString(error)}-${index}`}>
+                      {fieldErrorToString(error)}
                     </ErrorMessage>
                   ))}
                 </Field>
@@ -159,6 +189,7 @@ export function CreateTransactionForm({
                     onChange={(event) =>
                       field.handleChange(event.target.value as Transaction["type"])
                     }
+                    className="text-sm"
                   >
                     <option value="debit">Debit</option>
                     <option value="credit">Credit</option>
@@ -168,7 +199,7 @@ export function CreateTransactionForm({
             </form.AppField>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-2 sm:grid-cols-2">
             <form.AppField name="accountId">
               {(field) => (
                 <Field>
@@ -178,6 +209,7 @@ export function CreateTransactionForm({
                     onBlur={field.handleBlur}
                     onChange={(event) => field.handleChange(event.target.value)}
                     disabled={accountOptions.length === 0}
+                    className="text-sm"
                   >
                     {accountOptions.length === 0 ? (
                       <option value="">No accounts available</option>
@@ -189,8 +221,8 @@ export function CreateTransactionForm({
                     ))}
                   </Select>
                   {field.state.meta.errors.map((error, index) => (
-                    <ErrorMessage key={`${String(error)}-${index}`}>
-                      {String(error)}
+                    <ErrorMessage key={`${fieldErrorToString(error)}-${index}`}>
+                      {fieldErrorToString(error)}
                     </ErrorMessage>
                   ))}
                 </Field>
@@ -206,6 +238,7 @@ export function CreateTransactionForm({
                     onBlur={field.handleBlur}
                     onChange={(event) => field.handleChange(event.target.value)}
                     disabled={budgetLineOptions.length === 0}
+                    className="text-sm"
                   >
                     {budgetLineOptions.length === 0 ? (
                       <option value="">No budget lines available</option>
@@ -217,8 +250,8 @@ export function CreateTransactionForm({
                     ))}
                   </Select>
                   {field.state.meta.errors.map((error, index) => (
-                    <ErrorMessage key={`${String(error)}-${index}`}>
-                      {String(error)}
+                    <ErrorMessage key={`${fieldErrorToString(error)}-${index}`}>
+                      {fieldErrorToString(error)}
                     </ErrorMessage>
                   ))}
                 </Field>
@@ -226,51 +259,32 @@ export function CreateTransactionForm({
             </form.AppField>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_9rem]">
-            <form.AppField name="notes">
-              {(field) => (
-                <Field>
-                  <Label>Notes</Label>
-                  <Textarea
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(event) => field.handleChange(event.target.value)}
-                    placeholder="Optional memo for context or reconciliation"
-                    rows={4}
-                  />
-                </Field>
-              )}
-            </form.AppField>
-
-            <form.AppField name="amount">
-              {(field) => (
-                <Field>
-                  <Label>Amount</Label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    inputMode="decimal"
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(event) => field.handleChange(event.target.value)}
-                    placeholder="0.00"
-                  />
-                  {field.state.meta.errors.map((error, index) => (
-                    <ErrorMessage key={`${String(error)}-${index}`}>
-                      {String(error)}
-                    </ErrorMessage>
-                  ))}
-                </Field>
-              )}
-            </form.AppField>
-          </div>
+          <form.AppField name="notes">
+            {(field) => (
+              <Field>
+                <Label>Notes</Label>
+                <Textarea
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={(event) => field.handleChange(event.target.value)}
+                  placeholder="Optional memo"
+                  rows={2}
+                  className="[&_textarea]:min-h-[2.75rem] [&_textarea]:py-2 [&_textarea]:text-sm/5"
+                />
+              </Field>
+            )}
+          </form.AppField>
 
           {submitError ? (
-            <Text className="text-red-600 dark:text-red-400">{submitError}</Text>
+            <Text className="text-xs text-red-600 dark:text-red-400">
+              {submitError}
+            </Text>
           ) : null}
 
-          <div className="flex items-center justify-between gap-3 border-t border-zinc-950/6 pt-4 dark:border-white/8">
-            <Text>Transactions land in the ledger immediately after submit.</Text>
+          <div className="flex flex-col gap-2 border-t border-zinc-950/6 pt-3 sm:flex-row sm:items-center sm:justify-between dark:border-white/8">
+            <Text className="text-[0.7rem] leading-snug text-zinc-500 dark:text-zinc-400">
+              Shows in your transactions as soon as you submit.
+            </Text>
             <form.AppForm>
               <form.SubscribeButton color="dark/zinc">
                 <PlusIcon data-slot="icon" />

@@ -330,7 +330,7 @@ function BulkTransactionsPage() {
             <Heading>Bulk transactions</Heading>
             <Text>
               Upload a CSV, let the import preview assign budget lines, then
-              review and correct the ledger mapping before anything posts.
+              review and correct the import mapping before anything posts.
             </Text>
           </div>
 
