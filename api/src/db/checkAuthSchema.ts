@@ -1,12 +1,12 @@
 import { getMigrations } from "better-auth/db/migration";
 
-import { authSchemaOptions } from "../lib/auth.js";
+import { authOptions } from "../lib/auth.js";
 import { closeDb } from "./database.js";
 
 const checkAuthSchema = async () => {
   try {
     const { toBeAdded, toBeCreated, compileMigrations } =
-      await getMigrations(authSchemaOptions);
+      await getMigrations(authOptions);
 
     if (toBeAdded.length === 0 && toBeCreated.length === 0) {
       console.log("[auth-schema] Better Auth schema is in sync.");

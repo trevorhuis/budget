@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 
 import { FieldGroup, Fieldset } from "~/components/ui/fieldset";
 import { Subheading } from "~/components/ui/heading";
-import { CalculatorSurface } from "~/components/calculators/calculator-surface";
+import { CalculatorSurface } from "~/components/calculators/CalculatorSurface";
 
 export function CalculatorInputSection({ children }: { children: ReactNode }) {
   return (

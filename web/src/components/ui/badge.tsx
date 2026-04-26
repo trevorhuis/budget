@@ -32,6 +32,10 @@ const colors = {
   pink: "bg-pink-400/15 text-pink-700 group-data-hover:bg-pink-400/25 dark:bg-pink-400/10 dark:text-pink-400 dark:group-data-hover:bg-pink-400/20",
   rose: "bg-rose-400/15 text-rose-700 group-data-hover:bg-rose-400/25 dark:bg-rose-400/10 dark:text-rose-400 dark:group-data-hover:bg-rose-400/20",
   zinc: "bg-zinc-600/10 text-zinc-700 group-data-hover:bg-zinc-600/20 dark:bg-white/5 dark:text-zinc-400 dark:group-data-hover:bg-white/10",
+  positive: "bg-(--color-positive-bg) text-(--color-positive) group-data-hover:bg-(--color-positive-bg)",
+  negative: "bg-(--color-negative-bg) text-(--color-negative) group-data-hover:bg-(--color-negative-bg)",
+  warning: "bg-(--color-warning-bg) text-(--color-warning) group-data-hover:bg-(--color-warning-bg)",
+  accent: "bg-(--color-accent-light) text-(--color-accent-dark) group-data-hover:bg-(--color-accent-light) dark:text-(--color-accent)",
 };
 
 type BadgeProps = { color?: keyof typeof colors };
@@ -70,7 +74,7 @@ export const BadgeButton = forwardRef(function BadgeButton(
 ) {
   const classes = clsx(
     className,
-    "group relative inline-flex rounded-md focus:not-data-focus:outline-hidden data-focus:outline-2 data-focus:outline-offset-2 data-focus:outline-blue-500",
+    "group relative inline-flex rounded-md focus:not-data-focus:outline-hidden data-focus:outline-2 data-focus:outline-offset-2 data-focus:outline-(--color-accent)",
   );
 
   return typeof props.href === "string" ? (

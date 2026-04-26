@@ -3,12 +3,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo } from "react";
 
-import { LineChart } from "~/components/calculators/calculator-charts";
-import { CalculatorInputSection, CalculatorResultsColumn } from "~/components/calculators/calculator-editor";
-import { DateField, NumberField, SelectField } from "~/components/calculators/calculator-fields";
-import { CalculatorMetric, CalculatorMetricGrid } from "~/components/calculators/calculator-metrics";
-import { CalculatorScenarioShell } from "~/components/calculators/calculator-shell";
-import { CalculatorSurface } from "~/components/calculators/calculator-surface";
+import { LineChart } from "~/components/calculators/CalculatorCharts";
+import { CalculatorInputSection, CalculatorResultsColumn } from "~/components/calculators/CalculatorEditor";
+import { DateField, NumberField, SelectField } from "~/components/calculators/CalculatorFields";
+import { CalculatorMetric, CalculatorMetricGrid } from "~/components/calculators/CalculatorMetrics";
+import { CalculatorScenarioShell } from "~/components/calculators/CalculatorShell";
+import { CalculatorSurface } from "~/components/calculators/CalculatorSurface";
 import { Subheading } from "~/components/ui/heading";
 import {
   Table,

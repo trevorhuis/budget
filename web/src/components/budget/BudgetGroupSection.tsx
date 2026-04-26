@@ -59,50 +59,48 @@ export function BudgetGroupSection({
         tone.border,
       ].join(" ")}
     >
-      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3 border-b border-zinc-950/8 bg-zinc-950/[0.025] px-4 py-3 dark:border-white/10 dark:bg-white/[0.03]">
-        <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-6 gap-y-2 text-sm">
-          <div className="flex min-w-0 shrink-0 items-center gap-3">
-            <div className={["h-9 w-1 shrink-0 rounded-full", tone.bar].join(" ")} />
-            <div className="min-w-0 space-y-0.5">
-              <div className="text-sm font-semibold text-zinc-950 dark:text-white">
-                {group.group}
-              </div>
-              <Text className="text-sm/5 text-zinc-500 dark:text-zinc-400">
-                {linesLabel}
-              </Text>
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-3 border-b border-zinc-950/8 bg-zinc-950/[0.025] px-4 py-3 dark:border-white/10 dark:bg-white/[0.03]">
+        <div className="flex min-w-0 shrink-0 items-center gap-3">
+          <div className={["h-9 w-1 shrink-0 rounded-full", tone.bar].join(" ")} />
+          <div className="min-w-0 space-y-0.5">
+            <div className="text-sm font-semibold text-zinc-950 dark:text-white">
+              {group.group}
+            </div>
+            <Text className="text-sm/5 text-zinc-500 dark:text-zinc-400">
+              {linesLabel}
+            </Text>
+          </div>
+        </div>
+
+        <div className="flex flex-1 flex-wrap items-start justify-evenly gap-x-4 gap-y-2">
+          <div className="flex flex-col gap-1">
+            <div className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-zinc-500 dark:text-zinc-400">
+              Target
+            </div>
+            <div className="flex h-8 items-center">
+              <span className="font-semibold tabular-nums text-zinc-950 dark:text-white">
+                {formatCurrency(group.targetAmount)}
+              </span>
             </div>
           </div>
-
-          <div className="flex flex-wrap items-start gap-x-6 gap-y-2">
-            <div className="flex w-[6.75rem] shrink-0 flex-col gap-1">
-              <div className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-zinc-500 dark:text-zinc-400">
-                Target
-              </div>
-              <div className="flex h-8 items-center">
-                <span className="font-semibold tabular-nums text-zinc-950 dark:text-white">
-                  {formatCurrency(group.targetAmount)}
-                </span>
-              </div>
+          <div className="flex flex-col gap-1">
+            <div className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-zinc-500 dark:text-zinc-400">
+              Actual
             </div>
-            <div className="flex w-[6.75rem] shrink-0 flex-col gap-1">
-              <div className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-zinc-500 dark:text-zinc-400">
-                Actual
-              </div>
-              <div className="flex h-8 items-center">
-                <span className="font-semibold tabular-nums text-zinc-950 dark:text-white">
-                  {formatCurrency(group.actualAmount)}
-                </span>
-              </div>
+            <div className="flex h-8 items-center">
+              <span className="font-semibold tabular-nums text-zinc-950 dark:text-white">
+                {formatCurrency(group.actualAmount)}
+              </span>
             </div>
-            <div className="flex min-w-0 flex-col gap-1">
-              <div className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-zinc-500 dark:text-zinc-400">
-                Pace
-              </div>
-              <div className="flex h-8 items-center">
-                <Badge color={tone.chip}>
-                  {group.isIncome ? "Income" : "Expense"}
-                </Badge>
-              </div>
+          </div>
+          <div className="flex flex-col gap-1">
+            <div className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-zinc-500 dark:text-zinc-400">
+              Pace
+            </div>
+            <div className="flex h-8 items-center">
+              <Badge color={tone.chip}>
+                {group.isIncome ? "Income" : "Expense"}
+              </Badge>
             </div>
           </div>
         </div>
@@ -133,7 +131,7 @@ export function BudgetGroupSection({
           <col />
           <col style={{ width: "6.75rem" }} />
           <col style={{ width: "6.75rem" }} />
-          <col />
+          <col style={{ width: "8rem" }} />
           <col style={{ width: "9rem" }} />
           <col style={{ width: "5rem" }} />
         </colgroup>
@@ -142,7 +140,7 @@ export function BudgetGroupSection({
             <TableHeader>Category</TableHeader>
             <TableHeader className="text-right">Target</TableHeader>
             <TableHeader className="text-right">Actual</TableHeader>
-            <TableHeader>Variance</TableHeader>
+            <TableHeader className="text-right">Variance</TableHeader>
             <TableHeader>Status</TableHeader>
             <TableHeader className="text-right">Actions</TableHeader>
           </TableRow>

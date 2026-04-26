@@ -1,1 +1,59 @@
 @import "tailwindcss";
+
+@theme {
+  --font-sans: 'Syne', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'Courier New', monospace;
+  --font-serif: 'Instrument Serif', ui-serif, Georgia, serif;
+}
+
+@layer base {
+  :root {
+    /* Surfaces */
+    --color-canvas:       #F7F4EE;
+    --color-surface:      #FDFCF9;
+    --color-surface-dim:  #EDE9DF;
+
+    /* Ink (text + borders) */
+    --color-ink-900:      #1A1C22;
+    --color-ink-700:      #3A3D47;
+    --color-ink-500:      #6B6F7C;
+    --color-ink-200:      #D6D3CC;
+    --color-ink-100:      #EAE7E0;
+
+    /* Accent — Brass Gold */
+    --color-accent:       #B8863B;
+    --color-accent-light: #F5E6C8;
+    --color-accent-dark:  #7A5520;
+
+    /* Semantic */
+    --color-positive:     #1A7F4B;
+    --color-positive-bg:  #E8F5EE;
+    --color-negative:     #C0392B;
+    --color-negative-bg:  #FDECEA;
+    --color-warning:      #D97706;
+    --color-warning-bg:   #FEF3C7;
+  }
+
+  .dark {
+    --color-canvas:       #111210;
+    --color-surface:      #1C1C1A;
+    --color-surface-dim:  #252522;
+
+    --color-ink-900:      #F0EDE6;
+    --color-ink-700:      #BDB9B0;
+    --color-ink-500:      #7A776F;
+    --color-ink-200:      #333330;
+    --color-ink-100:      #252522;
+
+    --color-accent:       #D4A050;
+    --color-accent-light: #2A2215;
+    --color-accent-dark:  #F0C070;
+
+    --color-positive:     #34C97A;
+    --color-positive-bg:  #0D2A1A;
+    --color-negative:     #F56555;
+    --color-negative-bg:  #2A1010;
+    --color-warning:      #FBBF24;
+    --color-warning-bg:   #1F1A08;
+  }
+}

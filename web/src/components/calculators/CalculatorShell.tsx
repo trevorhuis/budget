@@ -20,9 +20,9 @@ import { Field, Label } from "~/components/ui/fieldset";
 import { Heading, Subheading } from "~/components/ui/heading";
 import { Input } from "~/components/ui/input";
 import { Text } from "~/components/ui/text";
-import { CalculatorActionButtons } from "~/components/calculators/calculator-actions";
-import { CalculatorFeedbackBanner } from "~/components/calculators/calculator-states";
-import { CalculatorSurface } from "~/components/calculators/calculator-surface";
+import { CalculatorActionButtons } from "~/components/calculators/CalculatorActions";
+import { CalculatorFeedbackBanner } from "~/components/calculators/CalculatorStates";
+import { CalculatorSurface } from "~/components/calculators/CalculatorSurface";
 
 export function CalculatorScenarioShell<TData extends JsonObject>({
   children,

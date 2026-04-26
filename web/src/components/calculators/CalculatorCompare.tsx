@@ -11,9 +11,9 @@ import { useCalculatorScenarios } from "~/hooks/calculators/useCalculatorScenari
 import { Badge } from "~/components/ui/badge";
 import { Heading, Subheading } from "~/components/ui/heading";
 import { Text } from "~/components/ui/text";
-import { CalculatorMetric } from "~/components/calculators/calculator-metrics";
-import { CalculatorNotice } from "~/components/calculators/calculator-states";
-import { CalculatorSurface } from "~/components/calculators/calculator-surface";
+import { CalculatorMetric } from "~/components/calculators/CalculatorMetrics";
+import { CalculatorNotice } from "~/components/calculators/CalculatorStates";
+import { CalculatorSurface } from "~/components/calculators/CalculatorSurface";
 
 export function CalculatorCompare() {
   const searchStr = useRouterState({

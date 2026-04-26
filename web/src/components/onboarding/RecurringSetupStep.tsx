@@ -7,6 +7,7 @@ import { Select } from "~/components/ui/select";
 import { Subheading } from "~/components/ui/heading";
 import { Text } from "~/components/ui/text";
 import { Textarea } from "~/components/ui/textarea";
+import { EmptyState } from "~/components/ui/EmptyState";
 
 type RecurringSetupStepProps = {
   recurringTransactions: OnboardingRecurringDraft[];
@@ -58,12 +59,10 @@ export function RecurringSetupStep({
         ) : null}
 
         {recurringTransactions.length === 0 ? (
-          <div className="rounded-[1.75rem] border border-dashed border-zinc-950/12 px-6 py-10 dark:border-white/10">
-            <Text>
-              No recurring templates yet. You can finish onboarding without
-              these and add them later from the transactions side.
-            </Text>
-          </div>
+          <EmptyState className="rounded-[1.75rem] border border-dashed border-zinc-950/12 dark:border-white/10">
+            No recurring templates yet. You can finish onboarding without
+            these and add them later from the transactions side.
+          </EmptyState>
         ) : (
           <div className="space-y-4">
             {recurringTransactions.map((recurring) => (

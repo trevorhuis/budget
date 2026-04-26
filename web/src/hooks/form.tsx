@@ -4,8 +4,8 @@ import { createFormHook } from "@tanstack/react-form";
 import type React from "react";
 
 import { fieldContext, formContext, useFormContext } from "~/hooks/form-context.ts";
-import { TextField } from "~/components/form/text-fields.tsx";
-import { Button } from "~/components/ui/button.tsx";
+import { TextField } from "~/components/form/TextFields";
+import { Button } from "~/components/ui/button";
 
 type SubscribeButtonProps = {
   children?: React.ReactNode;

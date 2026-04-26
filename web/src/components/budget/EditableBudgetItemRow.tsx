@@ -73,7 +73,7 @@ export function EditableBudgetItemRow({
       <TableCell className="align-middle text-right font-medium tabular-nums text-zinc-950 dark:text-white">
         {formatCurrency(row.budgetItem.actualAmount)}
       </TableCell>
-      <TableCell className="align-middle font-medium">
+      <TableCell className="align-middle text-right font-medium tabular-nums">
         {getBudgetVarianceLabel(row)}
       </TableCell>
       <TableCell className="align-middle">

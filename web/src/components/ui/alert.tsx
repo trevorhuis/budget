@@ -2,18 +2,7 @@ import * as Headless from "@headlessui/react";
 import clsx from "clsx";
 import type React from "react";
 import { Text } from "~/components/ui/text";
-
-const sizes = {
-  xs: "sm:max-w-xs",
-  sm: "sm:max-w-sm",
-  md: "sm:max-w-md",
-  lg: "sm:max-w-lg",
-  xl: "sm:max-w-xl",
-  "2xl": "sm:max-w-2xl",
-  "3xl": "sm:max-w-3xl",
-  "4xl": "sm:max-w-4xl",
-  "5xl": "sm:max-w-5xl",
-};
+import { modalSizes, type ModalSize } from "~/components/ui/modal-sizes";
 
 export function Alert({
   size = "md",
@@ -21,7 +10,7 @@ export function Alert({
   children,
   ...props
 }: {
-  size?: keyof typeof sizes;
+  size?: ModalSize;
   className?: string;
   children: React.ReactNode;
 } & Omit<Headless.DialogProps, "as" | "className">) {
@@ -38,7 +27,7 @@ export function Alert({
             transition
             className={clsx(
               className,
-              sizes[size],
+              modalSizes[size],
               "row-start-2 w-full rounded-2xl bg-white p-8 shadow-lg ring-1 ring-zinc-950/10 sm:rounded-2xl sm:p-6 dark:bg-zinc-900 dark:ring-white/10 forced-colors:outline",
               "transition duration-100 will-change-transform data-closed:opacity-0 data-enter:ease-out data-closed:data-enter:scale-95 data-leave:ease-in",
             )}

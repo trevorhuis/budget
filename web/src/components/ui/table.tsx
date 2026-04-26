@@ -57,7 +57,7 @@ export function Table({
           >
             <table
               className={clsx(
-                "min-w-full text-left text-sm/6 text-zinc-950 dark:text-white",
+                "min-w-full text-left text-sm/6 text-(--color-ink-900)",
                 tableClassName,
               )}
             >
@@ -77,7 +77,7 @@ export function TableHead({
   return (
     <thead
       {...props}
-      className={clsx(className, "text-zinc-500 dark:text-zinc-400")}
+      className={clsx(className, "text-(--color-ink-500)")}
     />
   );
 }
@@ -141,9 +141,9 @@ export function TableHeader({
       {...props}
       className={clsx(
         className,
-        "border-b border-b-zinc-950/10 px-4 py-2 font-medium first:pl-(--gutter,--spacing(2)) last:pr-(--gutter,--spacing(2)) dark:border-b-white/10",
+        "border-b border-b-(--color-ink-100) px-4 py-2 text-xs font-semibold uppercase tracking-widest text-(--color-ink-500) first:pl-(--gutter,--spacing(2)) last:pr-(--gutter,--spacing(2))",
         grid &&
-          "border-l border-l-zinc-950/5 first:border-l-0 dark:border-l-white/5",
+          "border-l border-l-(--color-ink-100) first:border-l-0",
         !bleed && "sm:first:pl-4 sm:last:pr-4",
       )}
     />

@@ -22,8 +22,8 @@ import {
   TableRow,
 } from "~/components/ui/table";
 import { Text } from "~/components/ui/text";
-import { CalculatorFeedbackBanner } from "~/components/calculators/calculator-states";
-import { CalculatorSurface } from "~/components/calculators/calculator-surface";
+import { CalculatorFeedbackBanner } from "~/components/calculators/CalculatorStates";
+import { CalculatorSurface } from "~/components/calculators/CalculatorSurface";
 import { formatDateTime } from "~/lib/calculators";
 
 export function CalculatorDashboard() {

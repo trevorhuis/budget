@@ -5,7 +5,6 @@ import {
   ChatBubbleLeftRightIcon,
   CreditCardIcon,
   DocumentArrowUpIcon,
-  Squares2X2Icon,
 } from "@heroicons/react/20/solid";
 import { Outlet, useRouterState } from "@tanstack/react-router";
 import { useState, type ComponentType, type SVGProps } from "react";
@@ -41,9 +40,6 @@ import {
 } from "~/components/ui/sidebar";
 import { StackedLayout } from "~/components/ui/stacked-layout";
 import { Text } from "~/components/ui/text";
-
-const isCalculatorPath = (pathname: string) =>
-  pathname === "/calculators" || pathname.startsWith("/calculators/");
 
 const isPrimaryTransactionsPath = (pathname: string) =>
   pathname === "/transactions" ||
@@ -89,12 +85,6 @@ const appNavLinks: AppNavLink[] = [
     to: "/chat",
     icon: ChatBubbleLeftRightIcon,
     isCurrent: (pathname) => pathname === "/chat",
-  },
-  {
-    label: "Calculators",
-    to: "/calculators",
-    icon: Squares2X2Icon,
-    isCurrent: isCalculatorPath,
   },
 ];
 

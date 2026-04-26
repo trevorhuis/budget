@@ -5,8 +5,8 @@ import type {
   TransactionBudgetLineOption,
 } from "~/lib/utils/transactions/options";
 import { CreateTransactionForm } from "~/components/transactions/CreateTransactionForm";
-import { TransactionsHeader } from "~/components/transactions/TransactionsHeader";
-import { TransactionsListSection } from "~/components/transactions/TransactionsListSection";
+import { Heading } from "~/components/ui/heading";
+import { TransactionTable } from "~/components/transactions/TransactionTable";
 import { TransactionsSummary } from "~/components/transactions/TransactionsSummary";
 
 type TransactionsViewProps = {
@@ -35,7 +35,14 @@ export function TransactionsView({
       className="space-y-6 border-b border-zinc-950/6 pb-6 dark:border-white/8"
     >
       <div className="space-y-4">
-        <TransactionsHeader />
+        <header>
+          <Heading
+            level={1}
+            className="!text-xl/none !font-semibold tracking-tight sm:!text-2xl/none"
+          >
+            Transactions
+          </Heading>
+        </header>
         <TransactionsSummary {...summary} />
       </div>
 
@@ -44,7 +51,9 @@ export function TransactionsView({
         budgetLineOptions={budgetLineOptions}
       />
 
-      <TransactionsListSection rows={transactionRows} />
+      <section className="min-w-0" aria-label="Transaction list and filters">
+        <TransactionTable rows={transactionRows} />
+      </section>
     </motion.section>
   );
 }

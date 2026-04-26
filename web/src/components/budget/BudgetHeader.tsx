@@ -16,16 +16,16 @@ export function BudgetHeader({
   return (
     <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-6">
       <div className="min-w-0 space-y-1">
-        <p className="text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-zinc-500 dark:text-zinc-400">
+        <p className="text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-(--color-ink-500)">
           Planning
-          <span className="mx-2 font-normal text-zinc-400 dark:text-zinc-600">
+          <span className="mx-2 font-normal text-(--color-ink-200)">
             ·
           </span>
-          <span className="text-zinc-600 dark:text-zinc-300">{monthLabel}</span>
+          <span className="text-(--color-ink-700)">{monthLabel}</span>
         </p>
         <Heading
           level={1}
-          className="!text-xl/none !font-semibold tracking-tight sm:!text-2xl/none"
+          className="!text-xl/none tracking-tight sm:!text-2xl/none"
         >
           Monthly budget
         </Heading>

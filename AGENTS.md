@@ -1,18 +1,3 @@
-<!-- intent-skills:start -->
-# Skill mappings
-
-When working in these areas, load the linked skill file into context.
-
-skills:
-  - task: "web/src/routes/*, route tree generation, and Vite route config"
-    load: "web/node_modules/.pnpm/@tanstack+router-plugin@1.166.13_@tanstack+react-router@1.167.4_react-dom@19.2.4_react@_3dfb4dee27455963bdbcbe1e610e95c2/node_modules/@tanstack/router-plugin/skills/router-plugin/SKILL.md"
-  - task: "web/src/routes/* page navigation, route loaders, auth guards, and route context"
-    load: "web/node_modules/.pnpm/@tanstack+router-core@1.167.4/node_modules/@tanstack/router-core/skills/router-core/SKILL.md"
-  - task: "web/src/lib/collections/* and shared collection sync handlers"
-    load: "web/node_modules/.pnpm/@tanstack+db@0.5.33_typescript@5.9.3/node_modules/@tanstack/db/skills/db-core/collection-setup/SKILL.md"
-  - task: "web/src/hooks/* and useLiveQuery or other TanStack DB React hooks"
-    load: "web/node_modules/.pnpm/@tanstack+react-db@0.1.77_react@19.2.4_typescript@5.9.3/node_modules/@tanstack/react-db/skills/react-db/SKILL.md"
-<!-- intent-skills:end -->
 
 # Budget Agent Guide
 

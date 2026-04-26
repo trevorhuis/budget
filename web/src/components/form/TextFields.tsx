@@ -1,9 +1,9 @@
 import { useStore } from "@tanstack/react-form";
 import type React from "react";
-import { ErrorMessage, Field, Label } from "~/components/ui/fieldset.tsx";
-import { Input } from "~/components/ui/input.tsx";
-import { useFieldContext } from "~/hooks/form-context.ts";
-import { fieldErrorToString } from "~/lib/utils/formErrors.ts";
+import { ErrorMessage, Field, Label } from "~/components/ui/fieldset";
+import { Input } from "~/components/ui/input";
+import { useFieldContext } from "~/hooks/form-context";
+import { fieldErrorToString } from "~/lib/utils/formErrors";
 
 type TextFieldProps = {
   label: string;

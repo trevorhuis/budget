@@ -1,15 +1,15 @@
 /* eslint-disable react-refresh/only-export-components */
 
-export { LineChart, DonutChart } from "~/components/calculators/calculator-charts";
-export { NumberField } from "~/components/calculators/calculator-fields";
+export { LineChart, DonutChart } from "~/components/calculators/CalculatorCharts";
+export { NumberField } from "~/components/calculators/CalculatorFields";
 export {
   CalculatorMetric as Metric,
   CalculatorMetricGrid,
-} from "~/components/calculators/calculator-metrics";
-export { ReadOnlyCalculatorReport } from "~/components/calculators/calculator-report";
-export { CalculatorScenarioShell as ScenarioShell } from "~/components/calculators/calculator-shell";
+} from "~/components/calculators/CalculatorMetrics";
+export { ReadOnlyCalculatorReport } from "~/components/calculators/CalculatorReport";
+export { CalculatorScenarioShell as ScenarioShell } from "~/components/calculators/CalculatorShell";
 export {
   CalculatorSurface as Surface,
-} from "~/components/calculators/calculator-surface";
+} from "~/components/calculators/CalculatorSurface";
 export { useScenarioDraft } from "~/hooks/calculators/useScenarioDraft";
 export { formatDateTime, readSearchParam } from "~/lib/calculators";

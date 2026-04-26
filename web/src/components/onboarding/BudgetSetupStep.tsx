@@ -4,7 +4,8 @@ import {
   PlusIcon,
   TrashIcon,
 } from "@heroicons/react/20/solid";
-import { type DragEvent, type FormEvent, useState } from "react";
+import { useStore } from "@tanstack/react-form";
+import { type DragEvent, useState } from "react";
 
 import type {
   OnboardingBudgetItemDraft,
@@ -16,6 +17,7 @@ import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Subheading } from "~/components/ui/heading";
 import { Text } from "~/components/ui/text";
+import { useAppForm } from "~/hooks/form";
 
 type BudgetSetupStepProps = {
   coreItems: OnboardingBudgetItemDraft[];
@@ -61,7 +63,6 @@ export function BudgetSetupStep({
   onDeleteItem,
   onMoveItemToGroup,
 }: BudgetSetupStepProps) {
-  const [newGroupName, setNewGroupName] = useState("");
   const [draggedItemId, setDraggedItemId] = useState<string | null>(null);
   const [dropTargetGroup, setDropTargetGroup] = useState<string | null>(null);
   const selectedPackItems = onboardingBudgetPacks.flatMap((pack) =>
@@ -73,18 +74,26 @@ export function BudgetSetupStep({
     ...customItems,
   ].filter((item) => item.enabled));
 
-  const handleAddGroup = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const newGroupForm = useAppForm({
+    defaultValues: {
+      groupName: "",
+    },
+    onSubmit: ({ value, formApi }) => {
+      const groupName = value.groupName.trim();
 
-    const groupName = newGroupName.trim();
+      if (!groupName) {
+        return;
+      }
 
-    if (!groupName) {
-      return;
-    }
+      onAddGroup(groupName);
+      formApi.reset({ groupName: "" });
+    },
+  });
 
-    onAddGroup(groupName);
-    setNewGroupName("");
-  };
+  const canSubmitNewGroup = useStore(
+    newGroupForm.store,
+    (state) => state.values.groupName.trim().length > 0,
+  );
 
   const handleSectionDragOver = (
     event: DragEvent<HTMLDivElement>,
@@ -153,7 +162,10 @@ export function BudgetSetupStep({
             </Text>
           </div>
           <form
-            onSubmit={handleAddGroup}
+            onSubmit={(event) => {
+              event.preventDefault();
+              void newGroupForm.handleSubmit();
+            }}
             className="rounded-[1.5rem] border border-zinc-950/8 bg-white/80 px-4 py-4 dark:border-white/10 dark:bg-white/[0.04]"
           >
             <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
@@ -166,16 +178,23 @@ export function BudgetSetupStep({
                 </Text>
               </div>
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center lg:min-w-[28rem]">
-                <Input
-                  className="sm:flex-1"
-                  value={newGroupName}
-                  onChange={(event) => setNewGroupName(event.target.value)}
-                  placeholder="Subscriptions"
-                  aria-label="New budget group name"
-                />
+                <newGroupForm.AppField name="groupName">
+                  {(field) => (
+                    <Input
+                      className="sm:flex-1"
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(event) =>
+                        field.handleChange(event.target.value)
+                      }
+                      placeholder="Subscriptions"
+                      aria-label="New budget group name"
+                    />
+                  )}
+                </newGroupForm.AppField>
                 <Button
                   type="submit"
-                  disabled={!newGroupName.trim()}
+                  disabled={!canSubmitNewGroup}
                   className="justify-center whitespace-nowrap sm:min-w-32"
                 >
                   <PlusIcon data-slot="icon" />
@@ -360,6 +379,13 @@ function BudgetLineRow({
   ) => void;
   onDelete: () => void;
 }) {
+  const lineForm = useAppForm({
+    defaultValues: {
+      name: item.name,
+      targetAmount: item.targetAmount,
+    },
+  });
+
   return (
     <div
       className={[
@@ -385,27 +411,43 @@ function BudgetLineRow({
       </div>
 
       <div className="space-y-2">
-        <Input
-          value={item.name}
-          onChange={(event) => onChange(item.id, "name", event.target.value)}
-          placeholder="Category name"
-          aria-label="Budget category name"
-        />
+        <lineForm.AppField name="name">
+          {(field) => (
+            <Input
+              value={field.state.value}
+              onBlur={field.handleBlur}
+              onChange={(event) => {
+                const value = event.target.value;
+                field.handleChange(value);
+                onChange(item.id, "name", value);
+              }}
+              placeholder="Category name"
+              aria-label="Budget category name"
+            />
+          )}
+        </lineForm.AppField>
         <Text>{item.description}</Text>
       </div>
 
       <div className="space-y-2">
-        <Input
-          type="number"
-          step="0.01"
-          min="0"
-          value={item.targetAmount}
-          onChange={(event) =>
-            onChange(item.id, "targetAmount", event.target.value)
-          }
-          placeholder="0.00"
-          aria-label="Target amount"
-        />
+        <lineForm.AppField name="targetAmount">
+          {(field) => (
+            <Input
+              type="number"
+              step="0.01"
+              min="0"
+              value={field.state.value}
+              onBlur={field.handleBlur}
+              onChange={(event) => {
+                const value = event.target.value;
+                field.handleChange(value);
+                onChange(item.id, "targetAmount", value);
+              }}
+              placeholder="0.00"
+              aria-label="Target amount"
+            />
+          )}
+        </lineForm.AppField>
         <Text>Monthly target</Text>
       </div>
 

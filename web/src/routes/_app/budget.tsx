@@ -137,7 +137,7 @@ function BudgetPage() {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, ease: "easeOut" }}
-        className="space-y-4 border-b border-zinc-950/6 pb-6 dark:border-white/8"
+        className="space-y-6 border-b border-(--color-ink-100) pb-8"
       >
         <BudgetHeader
           monthLabel={monthLabel}

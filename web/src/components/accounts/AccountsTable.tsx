@@ -4,6 +4,7 @@ import { Table, TableBody, TableHead, TableHeader, TableRow } from "~/components
 import { Subheading } from "~/components/ui/heading";
 import { Text } from "~/components/ui/text";
 import { EditableAccountRow } from "~/components/accounts/EditableAccountRow";
+import { EmptyState } from "~/components/ui/EmptyState";
 
 type AccountsTableProps = {
   accounts: Account[];
@@ -41,9 +42,7 @@ export function AccountsTable({
       </div>
 
       {accounts.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-zinc-950/10 px-6 py-12 dark:border-white/10">
-          <Text>No accounts yet. Add the first one to start tracking balances.</Text>
-        </div>
+        <EmptyState>No accounts yet. Add the first one to start tracking balances.</EmptyState>
       ) : (
         <Table dense striped className="mt-2">
           <TableHead>

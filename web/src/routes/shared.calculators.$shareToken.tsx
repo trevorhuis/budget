@@ -3,8 +3,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
-import { CalculatorReportHero, ReadOnlyCalculatorReport } from "~/components/calculators/calculator-report";
-import { CalculatorNotice } from "~/components/calculators/calculator-states";
+import { CalculatorReportHero, ReadOnlyCalculatorReport } from "~/components/calculators/CalculatorReport";
+import { CalculatorNotice } from "~/components/calculators/CalculatorStates";
 import {
   fetchSharedCalculator,
   normalizeCalculator,

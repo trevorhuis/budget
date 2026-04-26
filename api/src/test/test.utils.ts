@@ -20,6 +20,7 @@ export const setupTestDatabase = async () => {
       "authAccounts",
       "authVerifications",
       "users",
+      "rateLimit",
       "kysely_migration_lock",
       "kysely_migration"
     CASCADE
@@ -42,7 +43,8 @@ export const resetTestDatabase = async () => {
       "authSessions",
       "authAccounts",
       "authVerifications",
-      "users"
+      "users",
+      "rateLimit"
     RESTART IDENTITY CASCADE
   `.execute(db);
 };

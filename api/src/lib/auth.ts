@@ -45,20 +45,23 @@ const authBaseOptions = {
   },
   session: {
     modelName: "authSessions",
+    cookieCache: {
+      enabled: true,
+      maxAge: 60 * 5, // 5 minutes
+    },
+    expiresIn: 60 * 60 * 24 * 7, // 7 days
+    updateAge: 60 * 60 * 24, // 1 day
   },
   verification: {
     modelName: "authVerifications",
   },
-} satisfies Omit<BetterAuthOptions, "advanced">;
-
-export const authSchemaOptions = {
-  ...authBaseOptions,
-  advanced: {
-    database: {
-      generateId: "uuid",
-    },
+  rateLimit: {
+    enabled: process.env.NODE_ENV === "production",
+    window: 60,
+    max: 30,
+    storage: "database",
   },
-} satisfies BetterAuthOptions;
+} satisfies Omit<BetterAuthOptions, "advanced">;
 
 export const authOptions = {
   ...authBaseOptions,

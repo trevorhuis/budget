@@ -1,4 +1,4 @@
-import { formatCurrency } from "~/lib/format";
+import { formatCurrency } from "~/lib/utils/budgetUtils";
 import type { Account } from "~/lib/schemas";
 import {
   accountTypeColors,

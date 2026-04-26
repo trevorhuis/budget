@@ -1,9 +1,4 @@
-import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  ChevronUpDownIcon,
-  MagnifyingGlassIcon,
-} from "@heroicons/react/20/solid";
+
 import {
   createColumnHelper,
   flexRender,
@@ -20,6 +15,8 @@ import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Select } from "~/components/ui/select";
+import { SortableHeader } from "~/components/ui/SortableHeader";
+import { EmptyState } from "~/components/ui/EmptyState";
 import {
   Table,
   TableBody,
@@ -60,18 +57,8 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", {
 
 const formatCurrency = (amount: number) => currencyFormatter.format(amount);
 
-const formatImpact = (amount: number) => {
-  return `${amount >= 0 ? "+" : "-"}${formatCurrency(Math.abs(amount))}`;
-};
-
 const getTypeBadgeColor = (type: Transaction["type"]) => {
   return type === "debit" ? "sky" : "emerald";
-};
-
-const getImpactColorClassName = (value: number) => {
-  return value >= 0
-    ? "text-zinc-950 dark:text-white"
-    : "text-emerald-600 dark:text-emerald-400";
 };
 
 const columns = [
@@ -146,37 +133,7 @@ const columns = [
       </span>
     ),
   }),
-  columnHelper.accessor("signedAmount", {
-    header: ({ column }) => <SortableHeader column={column} label="Impact" />,
-    cell: (info) => (
-      <span className={getImpactColorClassName(info.getValue())}>
-        {formatImpact(info.getValue())}
-      </span>
-    ),
-  }),
 ];
-
-function SortableHeader({
-  column,
-  label,
-}: {
-  column: {
-    getIsSorted: () => false | "asc" | "desc";
-    toggleSorting: (desc?: boolean) => void;
-  };
-  label: string;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-      className="inline-flex items-center gap-1.5 text-left"
-    >
-      <span>{label}</span>
-      <ChevronUpDownIcon className="size-4 text-zinc-400" />
-    </button>
-  );
-}
 
 export function TransactionTable({ rows }: { rows: TransactionTableRow[] }) {
   const [searchValue, setSearchValue] = useState("");
@@ -292,19 +249,15 @@ export function TransactionTable({ rows }: { rows: TransactionTableRow[] }) {
       </div>
 
       {rows.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-zinc-950/10 px-6 py-10 dark:border-white/10">
-          <Text>
-            No transactions yet. Add the first one to start feeding actual spend
-            into the budget.
-          </Text>
-        </div>
+        <EmptyState>
+          No transactions yet. Add the first one to start feeding actual spend
+          into the budget.
+        </EmptyState>
       ) : filteredRows.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-zinc-950/10 px-6 py-10 dark:border-white/10">
-          <Text>
-            No transactions match the current filters. Clear the search or
-            switch filters to see more activity.
-          </Text>
-        </div>
+        <EmptyState>
+          No transactions match the current filters. Clear the search or
+          switch filters to see more activity.
+        </EmptyState>
       ) : (
         <>
           <Table

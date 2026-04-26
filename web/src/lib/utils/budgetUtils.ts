@@ -1,4 +1,5 @@
 import type { Budget, BudgetItem, Category } from "~/lib/schemas";
+export { formatCurrency } from "~/lib/format";
 
 export type BudgetRowStatus =
   | "funded"
@@ -36,11 +37,6 @@ export type MonthlyBudgetPageData = {
   plannedNet: number;
 };
 
-const currencyFormatter = new Intl.NumberFormat("en-US", {
-  currency: "USD",
-  style: "currency",
-});
-
 const monthFormatter = new Intl.DateTimeFormat("en-US", {
   month: "long",
   year: "numeric",
@@ -50,8 +46,6 @@ const fallbackMonth = (fallbackDate = new Date()) => ({
   month: fallbackDate.getMonth() + 1,
   year: fallbackDate.getFullYear(),
 });
-
-export const formatCurrency = (value: number) => currencyFormatter.format(value);
 
 export const formatMonthInputValue = (date: Date) => {
   const month = `${date.getMonth() + 1}`.padStart(2, "0");

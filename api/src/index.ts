@@ -13,6 +13,7 @@ import calculatorRouter from "./api/calculator.router.js";
 import recurringTransactionRouter from "./api/transactionRecurring.router.js";
 import transactionRouter from "./api/transaction.router.js";
 import { auth } from "./lib/auth.js";
+import { startSessionCleanup } from "./lib/session-cleanup.js";
 import { getAllowedWebOrigins } from "./env.js";
 
 const vercelPreviewHostPattern = /^[a-z0-9-]+\.vercel\.app$/i;
@@ -39,6 +40,9 @@ const isAllowedWebOrigin = (origin: string) => {
 };
 
 export const app = new Hono().basePath("/api");
+
+startSessionCleanup();
+
 app.use(logger());
 app.use(
   "*",

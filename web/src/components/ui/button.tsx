@@ -10,7 +10,7 @@ const styles = {
     // Sizing
     "px-[calc(--spacing(3.5)-1px)] py-[calc(--spacing(2.5)-1px)] sm:px-[calc(--spacing(3)-1px)] sm:py-[calc(--spacing(1.5)-1px)] sm:text-sm/6",
     // Focus
-    "focus:not-data-focus:outline-hidden data-focus:outline-2 data-focus:outline-offset-2 data-focus:outline-blue-500",
+    "focus:not-data-focus:outline-hidden data-focus:outline-2 data-focus:outline-offset-2 data-focus:outline-(--color-accent)",
     // Disabled
     "data-disabled:opacity-50",
     // Icon
@@ -154,6 +154,11 @@ const styles = {
     rose: [
       "text-white [--btn-hover-overlay:var(--color-white)]/10 [--btn-bg:var(--color-rose-500)] [--btn-border:var(--color-rose-600)]/90",
       "[--btn-icon:var(--color-rose-300)] data-active:[--btn-icon:var(--color-rose-200)] data-hover:[--btn-icon:var(--color-rose-200)]",
+    ],
+    accent: [
+      "text-white [--btn-bg:#B8863B] [--btn-border:#7A5520] [--btn-hover-overlay:rgb(255_255_255/0.15)]",
+      "dark:[--btn-bg:#D4A050] dark:[--btn-hover-overlay:rgb(255_255_255/0.10)]",
+      "[--btn-icon:rgb(255_255_255/0.7)] data-active:[--btn-icon:rgb(255_255_255/0.9)] data-hover:[--btn-icon:rgb(255_255_255/0.9)]",
     ],
   },
 };

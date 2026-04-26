@@ -1352,6 +1352,386 @@ describe("chat router", () => {
   });
 });
 
+describe("calculators router", () => {
+  test("supports full CRUD, duplicate, share, and ownership checks", async () => {
+    let response = await request("/api/calculators", { headers: primaryHeaders });
+    assert.equal(response.status, 200);
+    assert.deepEqual((await json(response)).data, []);
+
+    response = await request("/api/calculators", {
+      method: "POST",
+      headers: primaryHeaders,
+      json: {
+        id: "019cf45e-80f5-714a-a121-bb32f8365c01",
+        name: "Mortgage Calc",
+        calculatorType: "mortgage",
+        data: { principal: 300000, rate: 6.5, termYears: 30 },
+      },
+    });
+    assert.equal(response.status, 201);
+
+    response = await request("/api/calculators", { headers: primaryHeaders });
+    const listBody = await json(response);
+    assert.equal(response.status, 200);
+    assert.equal((listBody.data as JsonValue[]).length, 1);
+    assert.equal((listBody.data as JsonValue[])[0]?.name, "Mortgage Calc");
+    assert.equal((listBody.data as JsonValue[])[0]?.calculatorType, "mortgage");
+
+    response = await request("/api/calculators/019cf45e-80f5-714a-a121-bb32f8365c01", {
+      headers: primaryHeaders,
+    });
+    assert.equal(response.status, 200);
+    assert.equal((await json(response)).data.name, "Mortgage Calc");
+
+    response = await request("/api/calculators/019cf45e-80f5-714a-a121-bb32f8365c01", {
+      method: "PUT",
+      headers: primaryHeaders,
+      json: {
+        name: "Updated Mortgage Calc",
+        calculatorType: "mortgage",
+        data: { principal: 350000, rate: 6.0, termYears: 15 },
+      },
+    });
+    assert.equal(response.status, 200);
+
+    response = await request("/api/calculators/019cf45e-80f5-714a-a121-bb32f8365c01", {
+      headers: primaryHeaders,
+    });
+    assert.equal((await json(response)).data.name, "Updated Mortgage Calc");
+
+    response = await request("/api/calculators/019cf45e-80f5-714a-a121-bb32f8365c01/duplicate", {
+      method: "POST",
+      headers: primaryHeaders,
+    });
+    assert.equal(response.status, 201);
+    const duplicateBody = await json(response);
+    assert.equal((duplicateBody.data as JsonValue).name, "Updated Mortgage Calc Copy");
+
+    response = await request("/api/calculators/019cf45e-80f5-714a-a121-bb32f8365c01/share", {
+      method: "POST",
+      headers: primaryHeaders,
+    });
+    assert.equal(response.status, 200);
+    const shareToken = (await json(response)).data as JsonValue;
+    assert.equal(typeof shareToken.shareToken, "string");
+
+    response = await request(`/api/calculators/shared/${shareToken.shareToken}`);
+    assert.equal(response.status, 200);
+    assert.equal((await json(response)).data.name, "Updated Mortgage Calc");
+
+    response = await request("/api/calculators/019cf45e-80f5-714a-a121-bb32f8365c01/share", {
+      method: "DELETE",
+      headers: primaryHeaders,
+    });
+    assert.equal(response.status, 200);
+
+    response = await request("/api/calculators/019cf45e-80f5-714a-a121-bb32f8365c01", {
+      headers: primaryHeaders,
+    });
+    assert.equal(response.status, 200);
+    assert.equal((await json(response)).data.shareToken, null);
+
+    response = await request("/api/calculators/019cf45e-80f5-714a-a121-bb32f8365c01", {
+      method: "DELETE",
+      headers: primaryHeaders,
+    });
+    assert.equal(response.status, 200);
+
+    response = await request("/api/calculators", { headers: primaryHeaders });
+    assert.deepEqual((await json(response)).data, []);
+  });
+
+  test("returns 404 for shared token that does not exist", async () => {
+    const response = await request("/api/calculators/shared/not-a-real-token");
+    assert.equal(response.status, 404);
+  });
+
+  test("returns 401 for unauthenticated list and create", async () => {
+    let response = await request("/api/calculators");
+    assert.equal(response.status, 401);
+
+    response = await request("/api/calculators", {
+      method: "POST",
+      headers: authHeaders,
+      json: {
+        id: "019cf45e-80f5-714a-a121-bb32f8365c02",
+        name: "Loan Calc",
+        calculatorType: "loan",
+        data: {},
+      },
+    });
+    assert.equal(response.status, 401);
+  });
+
+  test("returns 403 when accessing another user's calculator", async () => {
+    let response = await request("/api/calculators", {
+      method: "POST",
+      headers: secondaryHeaders,
+      json: {
+        id: "019cf45e-80f5-714a-a121-bb32f8365c03",
+        name: "Secondary Calc",
+        calculatorType: "debtPayoff",
+        data: {},
+      },
+    });
+    assert.equal(response.status, 201);
+
+    response = await request("/api/calculators/019cf45e-80f5-714a-a121-bb32f8365c03", {
+      headers: primaryHeaders,
+    });
+    assert.equal(response.status, 403);
+
+    response = await request("/api/calculators/019cf45e-80f5-714a-a121-bb32f8365c03", {
+      method: "PUT",
+      headers: primaryHeaders,
+      json: { name: "Hijacked", calculatorType: "loan", data: {} },
+    });
+    assert.equal(response.status, 403);
+
+    response = await request("/api/calculators/019cf45e-80f5-714a-a121-bb32f8365c03/duplicate", {
+      method: "POST",
+      headers: primaryHeaders,
+    });
+    assert.equal(response.status, 403);
+
+    response = await request("/api/calculators/019cf45e-80f5-714a-a121-bb32f8365c03/share", {
+      method: "POST",
+      headers: primaryHeaders,
+    });
+    assert.equal(response.status, 403);
+
+    response = await request("/api/calculators/019cf45e-80f5-714a-a121-bb32f8365c03", {
+      method: "DELETE",
+      headers: primaryHeaders,
+    });
+    assert.equal(response.status, 403);
+  });
+
+  test("returns 404 for non-existent calculator id", async () => {
+    let response = await request("/api/calculators/019cf45e-80f5-714a-a121-bb32f8365fff", {
+      headers: primaryHeaders,
+    });
+    assert.equal(response.status, 404);
+
+    response = await request("/api/calculators/019cf45e-80f5-714a-a121-bb32f8365fff", {
+      method: "PUT",
+      headers: primaryHeaders,
+      json: { name: "Test", calculatorType: "mortgage", data: {} },
+    });
+    assert.equal(response.status, 404);
+
+    response = await request("/api/calculators/019cf45e-80f5-714a-a121-bb32f8365fff/duplicate", {
+      method: "POST",
+      headers: primaryHeaders,
+    });
+    assert.equal(response.status, 404);
+
+    response = await request("/api/calculators/019cf45e-80f5-714a-a121-bb32f8365fff/share", {
+      method: "POST",
+      headers: primaryHeaders,
+    });
+    assert.equal(response.status, 404);
+  });
+
+  test("returns 400 for invalid calculator create payload", async () => {
+    const response = await request("/api/calculators", {
+      method: "POST",
+      headers: primaryHeaders,
+      json: {
+        id: "019cf45e-80f5-714a-a121-bb32f8365c04",
+        name: "",
+        calculatorType: "mortgage",
+        data: {},
+      },
+    });
+    assert.equal(response.status, 400);
+
+    const response2 = await request("/api/calculators", {
+      method: "POST",
+      headers: primaryHeaders,
+      json: {
+        id: "019cf45e-80f5-714a-a121-bb32f8365c05",
+        name: "Bad Type",
+        calculatorType: "invalidType",
+        data: {},
+      },
+    });
+    assert.equal(response2.status, 400);
+  });
+});
+
+describe("auth endpoints", () => {
+  test("signs up a new user and returns a session cookie", async () => {
+    const response = await request("/api/auth/sign-up/email", {
+      method: "POST",
+      headers: authHeaders,
+      json: {
+        name: "New User",
+        email: "newuser@example.com",
+        password: "SecurePass123!",
+      },
+    });
+
+    assert.equal(response.status, 200);
+    const body = await json(response);
+    assert.equal(typeof body.user, "object");
+    assert.equal((body.user as JsonValue).email, "newuser@example.com");
+
+    const cookie = toCookieHeader(response);
+    assert.notEqual(cookie.length, 0);
+    assert.ok(cookie.includes("better-auth.session_token"));
+  });
+
+  test("signs in an existing user and returns a session cookie", async () => {
+    await request("/api/auth/sign-up/email", {
+      method: "POST",
+      headers: authHeaders,
+      json: {
+        name: "SignIn User",
+        email: "signin@example.com",
+        password: "SecurePass123!",
+      },
+    });
+
+    const response = await request("/api/auth/sign-in/email", {
+      method: "POST",
+      headers: authHeaders,
+      json: {
+        email: "signin@example.com",
+        password: "SecurePass123!",
+      },
+    });
+
+    assert.equal(response.status, 200);
+    const body = await json(response);
+    assert.equal(typeof body.user, "object");
+    assert.equal((body.user as JsonValue).email, "signin@example.com");
+
+    const cookie = toCookieHeader(response);
+    assert.notEqual(cookie.length, 0);
+  });
+
+  test("returns 400 for sign-up with invalid email", async () => {
+    const response = await request("/api/auth/sign-up/email", {
+      method: "POST",
+      headers: authHeaders,
+      json: {
+        name: "Bad Email",
+        email: "not-an-email",
+        password: "SecurePass123!",
+      },
+    });
+
+    assert.equal(response.status, 400);
+  });
+
+  test("returns 400 for sign-in with wrong password", async () => {
+    await request("/api/auth/sign-up/email", {
+      method: "POST",
+      headers: authHeaders,
+      json: {
+        name: "Wrong Pass",
+        email: "wrongpass@example.com",
+        password: "CorrectPass123!",
+      },
+    });
+
+    const response = await request("/api/auth/sign-in/email", {
+      method: "POST",
+      headers: authHeaders,
+      json: {
+        email: "wrongpass@example.com",
+        password: "WrongPass123!",
+      },
+    });
+
+    assert.equal(response.status, 400);
+  });
+
+  test("returns 400 for sign-up with missing fields", async () => {
+    const response = await request("/api/auth/sign-up/email", {
+      method: "POST",
+      headers: authHeaders,
+      json: {
+        email: "missing@example.com",
+      },
+    });
+    assert.equal(response.status, 400);
+
+    const response2 = await request("/api/auth/sign-up/email", {
+      method: "POST",
+      headers: authHeaders,
+      json: {
+        name: "Missing Email",
+        password: "SecurePass123!",
+      },
+    });
+    assert.equal(response2.status, 400);
+  });
+
+  test("signs out and clears session cookie", async () => {
+    await request("/api/auth/sign-up/email", {
+      method: "POST",
+      headers: authHeaders,
+      json: {
+        name: "SignOut User",
+        email: "signout@example.com",
+        password: "SecurePass123!",
+      },
+    });
+
+    const signInResponse = await request("/api/auth/sign-in/email", {
+      method: "POST",
+      headers: authHeaders,
+      json: {
+        email: "signout@example.com",
+        password: "SecurePass123!",
+      },
+    });
+    const cookie = toCookieHeader(signInResponse);
+
+    const response = await request("/api/auth/sign-out", {
+      method: "POST",
+      headers: { ...authHeaders, cookie },
+    });
+
+    assert.equal(response.status, 200);
+
+    const setCookie = response.headers.get("set-cookie");
+    assert.ok(setCookie?.includes("better-auth.session_token="));
+  });
+
+  test("get session returns user data with valid cookie", async () => {
+    await request("/api/auth/sign-up/email", {
+      method: "POST",
+      headers: authHeaders,
+      json: {
+        name: "Session Test",
+        email: "session@example.com",
+        password: "SecurePass123!",
+      },
+    });
+
+    const signInResponse = await request("/api/auth/sign-in/email", {
+      method: "POST",
+      headers: authHeaders,
+      json: {
+        email: "session@example.com",
+        password: "SecurePass123!",
+      },
+    });
+    const cookie = toCookieHeader(signInResponse);
+
+    const response = await request("/api/auth/get-session", {
+      headers: { ...authHeaders, cookie },
+    });
+
+    assert.equal(response.status, 200);
+    const body = await json(response);
+    assert.equal((body.user as JsonValue).email, "session@example.com");
+  });
+});
+
 describe("budget chat tools", () => {
   test("provide read-only budget domain tools with scoped data and computed summaries", async () => {
     await seedChatDomainData();

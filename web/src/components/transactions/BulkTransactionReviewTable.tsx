@@ -1,7 +1,6 @@
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
-  ChevronUpDownIcon,
   MagnifyingGlassIcon,
 } from "@heroicons/react/20/solid";
 import {
@@ -37,6 +36,8 @@ import {
 } from "~/components/ui/combobox";
 import { Input, InputGroup } from "~/components/ui/input";
 import { Select } from "~/components/ui/select";
+import { SortableHeader } from "~/components/ui/SortableHeader";
+import { EmptyState } from "~/components/ui/EmptyState";
 import {
   Table,
   TableBody,
@@ -127,28 +128,6 @@ const getStatusMeta = (row: BulkTransactionDraftRow) => {
     statusLabel: row.dirty ? "Edited" : "Ready",
   };
 };
-
-function SortableHeader({
-  column,
-  label,
-}: {
-  column: {
-    getIsSorted: () => false | "asc" | "desc";
-    toggleSorting: (desc?: boolean) => void;
-  };
-  label: string;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-      className="inline-flex items-center gap-1.5 text-left"
-    >
-      <span>{label}</span>
-      <ChevronUpDownIcon className="size-4 text-zinc-400" />
-    </button>
-  );
-}
 
 function BudgetItemPicker({
   budgetItemId,
@@ -602,16 +581,12 @@ export function BulkTransactionReviewTable({
       </div>
 
       {rows.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-zinc-950/10 px-6 py-10 dark:border-white/10">
-          <Text>No rows are available for review yet.</Text>
-        </div>
+        <EmptyState>No rows are available for review yet.</EmptyState>
       ) : filteredRows.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-zinc-950/10 px-6 py-10 dark:border-white/10">
-          <Text>
-            No rows match the current search and status filters. Clear the
-            filters to continue reviewing the import.
-          </Text>
-        </div>
+        <EmptyState>
+          No rows match the current search and status filters. Clear the
+          filters to continue reviewing the import.
+        </EmptyState>
       ) : (
         <>
           <Table

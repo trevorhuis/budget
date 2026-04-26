@@ -2,7 +2,7 @@ import { PencilSquareIcon, TrashIcon } from "@heroicons/react/20/solid";
 import type { Account } from "~/lib/schemas";
 import type { AccountFormValues } from "~/lib/utils/accountFormUtils";
 import { accountTypeLabels, accountTypes } from "~/lib/utils/accountUtils";
-import { formatCurrency } from "~/lib/format";
+import { formatCurrency } from "~/lib/utils/budgetUtils";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Select } from "~/components/ui/select";

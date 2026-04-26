@@ -13,11 +13,9 @@ import { useEffect, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Subheading } from "~/components/ui/heading";
 import { Text } from "~/components/ui/text";
-import { AccountSetupStep } from "~/components/onboarding/account-setup-step";
-import { BudgetSetupStep } from "~/components/onboarding/budget-setup-step";
-import { OnboardingShell } from "~/components/onboarding/onboarding-shell";
-import { OnboardingSidebarSummary } from "~/components/onboarding/onboarding-sidebar-summary";
-import { RecurringSetupStep } from "~/components/onboarding/recurring-setup-step";
+import { AccountSetupStep } from "~/components/onboarding/AccountSetupStep";
+import { BudgetSetupStep } from "~/components/onboarding/BudgetSetupStep";
+import { RecurringSetupStep } from "~/components/onboarding/RecurringSetupStep";
 import { resolveAuthSession } from "~/lib/auth";
 import { categoryCollection } from "~/lib/collections/categoryCollection";
 import {

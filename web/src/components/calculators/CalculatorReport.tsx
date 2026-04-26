@@ -19,9 +19,9 @@ import {
   TableRow,
 } from "~/components/ui/table";
 import { Text } from "~/components/ui/text";
-import { LineChart, DonutChart } from "~/components/calculators/calculator-charts";
-import { CalculatorMetric, CalculatorMetricGrid } from "~/components/calculators/calculator-metrics";
-import { CalculatorSurface } from "~/components/calculators/calculator-surface";
+import { LineChart, DonutChart } from "~/components/calculators/CalculatorCharts";
+import { CalculatorMetric, CalculatorMetricGrid } from "~/components/calculators/CalculatorMetrics";
+import { CalculatorSurface } from "~/components/calculators/CalculatorSurface";
 import { formatDateTime } from "~/lib/calculators";
 
 export function CalculatorReportHero({ calculator }: { calculator: Calculator }) {

@@ -4,7 +4,7 @@ import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Heading } from "~/components/ui/heading";
 import { Text } from "~/components/ui/text";
-import { CalculatorSurface } from "~/components/calculators/calculator-surface";
+import { CalculatorSurface } from "~/components/calculators/CalculatorSurface";
 
 export function CalculatorNotice({
   actionHref,
